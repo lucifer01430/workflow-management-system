@@ -1,0 +1,46 @@
+{% extends "base/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="p-4 bg-light rounded-3 shadow-sm">
+            <h2 class="mb-2">Welcome, {{ request.user.full_name|default:request.user.username }}</h2>
+            <p class="mb-1"><strong>Email:</strong> {{ request.user.email }}</p>
+            <p class="mb-1"><strong>Role:</strong> {{ request.user.get_role_display }}</p>
+            <p class="mb-1"><strong>Department:</strong> {{ request.user.department|default:"Not assigned" }}</p>
+            <p class="mb-0"><strong>Designation:</strong> {{ request.user.designation|default:"Not assigned" }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Profile Status</h5>
+                <p class="card-text">Your account is active and ready to use.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Task Module</h5>
+                <p class="card-text">Task features will appear here in the next phase.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Notifications</h5>
+                <p class="card-text">Important approvals and updates will show here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

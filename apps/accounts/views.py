@@ -92,7 +92,7 @@ class UserLoginView(LoginView):
 
         login(self.request, user)
         messages.success(self.request, "Login successful.")
-        return redirect("core:home")
+        return redirect("dashboard:home")
 
 
 def logout_view(request):
