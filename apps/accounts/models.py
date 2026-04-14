@@ -43,6 +43,20 @@ class User(AbstractUser):
     full_name = models.CharField(max_length=255)
     employee_number = models.CharField(max_length=50, unique=True, null=True, blank=True)
     mobile_number = models.CharField(max_length=20, blank=True, null=True)
+    department = models.ForeignKey(
+        "departments.Department",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="users",
+    )
+    designation = models.ForeignKey(
+        "departments.Designation",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="users",
+    )
     role = models.CharField(
         max_length=30,
         choices=UserRole.choices,
@@ -59,3 +73,4 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.full_name or self.username} ({self.email})"
+    

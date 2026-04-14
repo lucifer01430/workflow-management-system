@@ -14,6 +14,8 @@ class CustomUserAdmin(UserAdmin):
         "username",
         "full_name",
         "employee_number",
+        "department",
+        "designation",
         "role",
         "is_active",
         "is_active_by_admin",
@@ -36,7 +38,15 @@ class CustomUserAdmin(UserAdmin):
             "fields": ("email", "username", "password")
         }),
         ("Personal Information", {
-            "fields": ("full_name", "employee_number", "mobile_number", "profile_image", "role")
+      "fields": (
+        "full_name",
+        "employee_number",
+        "mobile_number",
+        "department",
+        "designation",
+        "profile_image",
+        "role",
+            )
         }),
         ("Permissions", {
             "fields": ("is_active", "is_active_by_admin", "is_email_verified", "is_staff", "is_superuser", "groups", "user_permissions")
@@ -55,6 +65,8 @@ class CustomUserAdmin(UserAdmin):
                 "full_name",
                 "employee_number",
                 "mobile_number",
+                "department",
+                "designation",
                 "role",
                 "password1",
                 "password2",
