@@ -193,4 +193,12 @@ JAZZMIN_SETTINGS = {
     "changeform_format": "horizontal_tabs",
 }
 
+
 AUTH_USER_MODEL = "accounts.User"
+
+AUTHENTICATION_BACKENDS = [
+    "apps.accounts.backends.EmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

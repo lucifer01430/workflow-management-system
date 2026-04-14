@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3 class="mb-0">Verify OTP</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">
+                    Enter the OTP sent to <strong>{{ user_obj.email }}</strong>
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.otp_code.label_tag }}
+                    {{ form.otp_code }}
+                    {% if form.otp_code.errors %}
+                        <div class="text-danger small mt-1">{{ form.otp_code.errors|striptags }}</div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-success w-100 mt-3">Verify OTP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
