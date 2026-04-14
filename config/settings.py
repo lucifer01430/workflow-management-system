@@ -130,3 +130,5 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome to Workflow Management System Admin Panel",
     "copyright": "Designed & Developed by Harsh",
 }
+
+AUTH_USER_MODEL = "accounts.User"
