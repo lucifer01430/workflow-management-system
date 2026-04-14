@@ -177,7 +177,8 @@ JAZZMIN_SETTINGS = {
         "dashboard": "fas fa-chart-line",
         "notifications": "fas fa-bell",
         "reports": "fas fa-file-alt",
-        "auditlogs": "fas fa-history"
+        "auditlogs": "fas fa-history",
+        "accounts.EmailOTP": "fas fa-envelope-open-text",
     },
 
     "default_icon_parents": "fas fa-folder",

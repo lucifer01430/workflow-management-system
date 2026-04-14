@@ -8,6 +8,11 @@ class UserRole(models.TextChoices):
     HOD = "hod", "HOD"
     EMPLOYEE = "employee", "Employee"
 
+class RegistrationStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -66,6 +71,21 @@ class User(AbstractUser):
     is_active_by_admin = models.BooleanField(default=False)
     is_email_verified = models.BooleanField(default=False)
 
+    registration_status = models.CharField(
+        max_length=20,
+        choices=RegistrationStatus.choices,
+        default=RegistrationStatus.PENDING,
+    )
+    approved_by = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="approved_users",
+    )
+    approved_at = models.DateTimeField(blank=True, null=True)
+    rejection_reason = models.TextField(blank=True, null=True)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
@@ -73,4 +93,21 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.full_name or self.username} ({self.email})"
+    
+class EmailOTP(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="email_otps",
+    )
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"OTP for {self.user.email} - {self.otp_code}"
     
