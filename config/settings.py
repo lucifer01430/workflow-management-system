@@ -122,13 +122,74 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
     "site_title": "Workflow Management Admin",
     "site_header": "Workflow Management System",
     "site_brand": "WMS Admin",
+    "site_logo": None,
+    "login_logo": None,
+    "login_logo_dark": None,
+    "site_icon": None,
     "welcome_sign": "Welcome to Workflow Management System Admin Panel",
     "copyright": "Designed & Developed by Harsh",
+
+    "search_model": ["accounts.User", "departments.Department", "departments.Designation"],
+
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"model": "accounts.User"},
+        {"model": "departments.Department"},
+        {"model": "departments.Designation"},
+    ],
+
+    "usermenu_links": [
+        {"name": "View Site", "url": "/", "new_window": False},
+    ],
+
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+
+    "order_with_respect_to": [
+        "accounts",
+        "departments",
+        "employees",
+        "tasks",
+        "approvals",
+        "dashboard",
+        "notifications",
+        "reports",
+        "auditlogs",
+    ],
+
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.Group": "fas fa-users",
+        "accounts.User": "fas fa-user-shield",
+        "departments.Department": "fas fa-building",
+        "departments.Designation": "fas fa-id-badge",
+        "employees": "fas fa-user-tie",
+        "tasks": "fas fa-tasks",
+        "approvals": "fas fa-check-circle",
+        "dashboard": "fas fa-chart-line",
+        "notifications": "fas fa-bell",
+        "reports": "fas fa-file-alt",
+        "auditlogs": "fas fa-history"
+    },
+
+    "default_icon_parents": "fas fa-folder",
+    "default_icon_children": "fas fa-circle",
+
+    "related_modal_active": True,
+    "custom_css": None,
+    "custom_js": None,
+
+    "show_ui_builder": False,
+
+    "changeform_format": "horizontal_tabs",
 }
 
 AUTH_USER_MODEL = "accounts.User"
