@@ -73,6 +73,21 @@ class RegisterForm(forms.ModelForm):
         return cleaned_data
 
 
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "full_name",
+            "mobile_number",
+            "profile_image",
+        ]
+        widgets = {
+            "full_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter your full name"}),
+            "mobile_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter your mobile number"}),
+            "profile_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+        }
+
+
 class OTPVerificationForm(forms.Form):
     otp_code = forms.CharField(
         max_length=6,

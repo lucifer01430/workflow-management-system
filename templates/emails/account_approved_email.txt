@@ -1,0 +1,13 @@
+Workflow Management System
+
+Hello {{ recipient_name }},
+
+Your account has been approved.
+
+Email: {{ email }}
+Role: {{ role }}
+Department: {{ department|default:"-" }}
+
+Workflow Management System
+Designed & Developed by Harsh
+Portfolio: https://lucifer01430.github.io/Portfolio

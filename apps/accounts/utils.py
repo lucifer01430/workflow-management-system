@@ -6,10 +6,11 @@ import time
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.mail import EmailMessage, get_connection
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.template.loader import render_to_string
 from django.utils import timezone
 
-from apps.accounts.models import EmailOTP
+from apps.accounts.models import EmailOTP, RegistrationStatus, User, UserRole
 
 logger = logging.getLogger(__name__)
 
@@ -40,21 +41,23 @@ def create_and_send_otp(user):
     )
 
     subject = "Your OTP for Workflow Management System"
-    message = (
-        f"Hello {user.full_name},\n\n"
-        f"Your OTP is: {otp}\n"
-        f"This OTP is valid for 10 minutes.\n\n"
-        f"If you did not request this registration, please ignore this email.\n\n"
-        f"Regards,\n"
-        f"Workflow Management System"
-    )
+    context = {
+        "recipient_name": user.full_name or user.username,
+        "otp": otp,
+        "expires_in_minutes": 10,
+        "software_name": "Workflow Management System",
+        "support_note": "If you did not request this registration, please ignore this email.",
+    }
+    text_message = render_to_string("emails/otp_email.txt", context)
+    html_message = render_to_string("emails/otp_email.html", context)
 
-    email = EmailMessage(
+    email = EmailMultiAlternatives(
         subject=subject,
-        body=message,
+        body=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[user.email],
     )
+    email.attach_alternative(html_message, "text/html")
 
     max_attempts = 2
     last_exception = None
@@ -124,3 +127,30 @@ def create_and_send_otp(user):
                     logger.debug("Ignoring SMTP connection close failure", exc_info=True)
 
     raise last_exception
+
+
+def get_reporting_contacts(user):
+    reporting_hod = None
+    reporting_gm = None
+
+    gm_queryset = User.objects.filter(
+        role=UserRole.GENERAL_MANAGER,
+        is_active=True,
+        is_active_by_admin=True,
+        registration_status=RegistrationStatus.APPROVED,
+    ).select_related("department", "designation")
+
+    if user.role == UserRole.EMPLOYEE:
+        if (
+            user.department
+            and user.department.hod
+            and user.department.hod.is_active
+            and user.department.hod.is_active_by_admin
+            and user.department.hod.registration_status == RegistrationStatus.APPROVED
+        ):
+            reporting_hod = user.department.hod
+        reporting_gm = gm_queryset.first()
+    elif user.role == UserRole.HOD:
+        reporting_gm = gm_queryset.first()
+
+    return reporting_hod, reporting_gm

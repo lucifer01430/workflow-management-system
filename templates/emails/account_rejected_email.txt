@@ -1,0 +1,12 @@
+Workflow Management System
+
+Hello {{ recipient_name }},
+
+Your account request was not approved.
+
+Email: {{ email }}
+Reason: {{ rejection_reason|default:"No reason provided" }}
+
+Workflow Management System
+Designed & Developed by Harsh
+Portfolio: https://lucifer01430.github.io/Portfolio

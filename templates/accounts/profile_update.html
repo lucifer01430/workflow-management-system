@@ -1,0 +1,83 @@
+{% extends "base/dashboard_base.html" %}
+
+{% block title %}Update Profile{% endblock %}
+{% block page_title %}Update Profile{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'accounts:profile' %}">My Profile</a></li>
+<li class="breadcrumb-item active">Update Profile</li>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i>Back to Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if request.user.profile_image %}
+                <img id="profilePreview" src="{{ request.user.profile_image.url }}" alt="Profile image" class="img-circle elevation-2 profile-avatar mb-3" width="120" height="120">
+                {% else %}
+                <img id="profilePreview" src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/img/user2-160x160.jpg" alt="Profile image" class="img-circle elevation-2 profile-avatar mb-3" width="120" height="120">
+                {% endif %}
+                <h3 class="h4 mb-1">{{ request.user.full_name|default:request.user.username }}</h3>
+                <p class="text-muted mb-0">{{ request.user.email }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="card-title"><i class="fas fa-user-pen mr-2 text-primary"></i>Update Basic Details</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="row">
+                        {% for field in form %}
+                        <div class="{% if field.name == 'profile_image' %}col-12{% else %}col-md-6{% endif %} mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label font-weight-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<small class="text-muted d-block mt-1">{{ field.help_text }}</small>{% endif %}
+                            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|striptags }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="alert alert-light border">
+                        You can update only your profile picture, mobile number, and basic personal name details here. Role, department, designation, and approval-controlled fields are read-only.
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Save Changes</button>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var input = document.getElementById("id_profile_image");
+        var preview = document.getElementById("profilePreview");
+        if (!input || !preview) {
+            return;
+        }
+        input.addEventListener("change", function (event) {
+            var file = event.target.files && event.target.files[0];
+            if (!file) {
+                return;
+            }
+            preview.src = URL.createObjectURL(file);
+        });
+    })();
+</script>
+{% endblock %}

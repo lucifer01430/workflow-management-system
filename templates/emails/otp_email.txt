@@ -1,0 +1,14 @@
+Workflow Management System
+
+Hello {{ recipient_name }},
+
+Use the following OTP to complete your email verification:
+{{ otp }}
+
+This OTP is valid for {{ expires_in_minutes }} minutes.
+
+{{ support_note }}
+
+Workflow Management System
+Designed & Developed by Harsh
+Portfolio: https://lucifer01430.github.io/Portfolio

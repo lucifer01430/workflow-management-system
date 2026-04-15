@@ -1,0 +1,49 @@
+<li class="nav-item dropdown">
+    <a class="nav-link position-relative" data-toggle="dropdown" href="#">
+        <i class="far fa-bell"></i>
+        {% if unread_notifications_count > 0 %}
+            <span id="navbar-notification-badge" class="badge badge-warning navbar-badge">
+                {{ unread_notifications_count }}
+            </span>
+        {% endif %}
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right shadow-sm notification-dropdown p-0">
+        <div class="dropdown-header font-weight-bold py-2">
+            Recent Notifications
+        </div>
+
+        {% if unread_notifications %}
+            {% for notification in unread_notifications %}
+                <div class="dropdown-divider m-0"></div>
+                <a
+                    href="{% if notification.task %}{% url 'tasks:detail' notification.task.id %}{% else %}{% url 'notifications:list' %}{% endif %}"
+                    class="dropdown-item py-3 bg-light"
+                >
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="pr-2">
+                            <div class="font-weight-bold text-dark mb-1">
+                                {{ notification.title|truncatechars:35 }}
+                            </div>
+                            <div class="text-muted small mb-1">
+                                {{ notification.message|truncatechars:60 }}
+                            </div>
+                            <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                        </div>
+                        <span class="badge badge-warning mt-1">New</span>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="dropdown-divider m-0"></div>
+            <div class="dropdown-item text-muted py-3 text-center">
+                No recent notifications.
+            </div>
+        {% endif %}
+
+        <div class="dropdown-divider m-0"></div>
+        <a href="{% url 'notifications:list' %}" class="dropdown-item dropdown-footer text-center py-2">
+            View all notifications
+        </a>
+    </div>
+</li>

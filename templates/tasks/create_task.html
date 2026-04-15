@@ -3,39 +3,113 @@
 {% block title %}Create Task{% endblock %}
 {% block page_title %}Create Task{% endblock %}
 
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'tasks:my_tasks' %}">Tasks</a></li>
+<li class="breadcrumb-item active">Create Task</li>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'tasks:my_tasks' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left mr-1"></i> Back to Tasks
+</a>
+{% endblock %}
+
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Create New Task</h3>
-    </div>
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
-
-            <div class="row">
-                {% for field in form %}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small class="text-muted d-block">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% if field.errors %}
-                            <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card card-outline card-primary shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title font-weight-semibold">
+                    <i class="fas fa-plus-circle text-primary mr-2"></i>Create New Task
+                </h3>
             </div>
 
-            <button type="submit" class="btn btn-primary">Save Task</button>
-            <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">Cancel</a>
-        </form>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        {% for field in form %}
+                        <div class="{% if field.name == 'description' or field.name == 'approval_note' or field.name == 'internal_note' or field.name == 'assigned_to' %}col-12{% else %}col-md-6{% endif %}">
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="font-weight-semibold">
+                                    {{ field.label }}
+                                </label>
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                <small class="form-text text-muted">
+                                    {{ field.help_text }}
+                                </small>
+                                {% endif %}
+
+                                {% if field.errors %}
+                                <small class="text-danger d-block mt-1">
+                                    {{ field.errors|striptags }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Save Task
+                    </button>
+                    <a href="{% url 'dashboard:home' %}" class="btn btn-outline-secondary ml-2">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card card-outline card-info shadow-sm">
+            <div class="card-header">
+                <h3 class="card-title font-weight-semibold">
+                    <i class="fas fa-info-circle text-info mr-2"></i>Submission Notes
+                </h3>
+            </div>
+
+            <div class="card-body">
+                <div class="info-box bg-light">
+                    <div class="info-box-content">
+                        <span class="info-box-text font-weight-semibold text-dark">Quick Task</span>
+                        <span class="text-muted small">
+                            Assigned directly when employees are selected.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-box bg-light">
+                    <div class="info-box-content">
+                        <span class="info-box-text font-weight-semibold text-dark">Approval Task</span>
+                        <span class="text-muted small">
+                            Moves to the GM or Super Admin approval flow before execution.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-box bg-light mb-0">
+                    <div class="info-box-content">
+                        <span class="info-box-text font-weight-semibold text-dark">Assignment</span>
+                        <span class="text-muted small">
+                            Use the assignee selector to assign one or more active team members.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

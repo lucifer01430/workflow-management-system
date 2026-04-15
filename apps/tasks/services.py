@@ -5,7 +5,17 @@ from apps.accounts.models import UserRole
 from apps.auditlogs.utils import log_activity
 from apps.notifications.models import NotificationType
 from apps.notifications.utils import create_notification, send_action_email
-from apps.tasks.models import Task, TaskAssignment, TaskStatus, TaskType
+from apps.tasks.models import TaskAssignment, TaskStatus, TaskType
+
+
+def _email_context(recipient_name, task, **extra):
+    context = {
+        "recipient_name": recipient_name,
+        "task": task,
+        "software_name": "Workflow Management System",
+    }
+    context.update(extra)
+    return context
 
 
 @transaction.atomic
@@ -58,6 +68,14 @@ def create_task_with_workflow(*, form, created_by):
                     f"Please check your dashboard for details."
                 ),
                 recipient_list=[user.email],
+                html_template="emails/task_assigned_email.html",
+                text_template="emails/task_assigned_email.txt",
+                context=_email_context(
+                    user.full_name or user.username,
+                    task,
+                    heading="New Task Assigned",
+                    action_copy="Please check your dashboard to review the task details and due date.",
+                ),
             )
 
         log_activity(
@@ -97,6 +115,15 @@ def create_task_with_workflow(*, form, created_by):
                     f"Please review it from the system dashboard."
                 ),
                 recipient_list=[gm.email],
+                html_template="emails/task_approval_required_email.html",
+                text_template="emails/task_approval_required_email.txt",
+                context=_email_context(
+                    gm.full_name or gm.username,
+                    task,
+                    heading="Task Approval Required",
+                    action_copy="A new task is waiting in the approval inbox for your review.",
+                    created_by_name=created_by.full_name or created_by.username,
+                ),
             )
 
         log_activity(
@@ -148,6 +175,15 @@ def approve_task(*, task, approved_by):
                     f"Please check your dashboard for details."
                 ),
                 recipient_list=[user.email],
+                html_template="emails/task_approved_email.html",
+                text_template="emails/task_approved_email.txt",
+                context=_email_context(
+                    user.full_name or user.username,
+                    task,
+                    heading="Task Approved and Assigned",
+                    action_copy="The approved task is now live in your dashboard.",
+                    actor_name=approved_by.full_name or approved_by.username,
+                ),
             )
 
     create_notification(
@@ -167,6 +203,15 @@ def approve_task(*, task, approved_by):
             f"You can now track it from your dashboard."
         ),
         recipient_list=[task.created_by.email],
+        html_template="emails/task_approved_email.html",
+        text_template="emails/task_approved_email.txt",
+        context=_email_context(
+            task.created_by.full_name or task.created_by.username,
+            task,
+            heading="Task Approved",
+            action_copy="You can now track task execution from your dashboard.",
+            actor_name=approved_by.full_name or approved_by.username,
+        ),
     )
 
     log_activity(
@@ -209,6 +254,16 @@ def reject_task(*, task, rejected_by, reason=""):
             f"Please review and update accordingly."
         ),
         recipient_list=[task.created_by.email],
+        html_template="emails/task_rejected_email.html",
+        text_template="emails/task_rejected_email.txt",
+        context=_email_context(
+            task.created_by.full_name or task.created_by.username,
+            task,
+            heading="Task Rejected",
+            action_copy="Please review the rejection reason and update the task details if needed.",
+            actor_name=rejected_by.full_name or rejected_by.username,
+            rejection_reason=reason or "No reason provided",
+        ),
     )
 
     log_activity(

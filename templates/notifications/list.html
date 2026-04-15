@@ -1,0 +1,52 @@
+{% extends "base/dashboard_base.html" %}
+
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+<li class="breadcrumb-item active">Notifications</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <h3 class="card-title mb-2 mb-md-0"><i class="fas fa-bell mr-2 text-warning"></i>My Notifications</h3>
+                    <input type="text" class="form-control form-control-sm" style="max-width: 240px;" placeholder="Search notifications (UI placeholder)">
+                </div>
+            </div>
+            <div class="card-body">
+                {% for notification in notifications %}
+                <div class="card card-outline {% if not notification.is_read %}card-warning{% else %}card-light{% endif %} mb-3 shadow-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start flex-column flex-md-row">
+                            <div class="pr-md-3 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if not notification.is_read %}<span class="badge badge-warning mr-2">Unread</span>{% endif %}
+                                    <h5 class="mb-0">{{ notification.title }}</h5>
+                                </div>
+                                <p class="text-muted mb-2">{{ notification.message }}</p>
+                                <small class="text-muted"><i class="far fa-clock mr-1"></i>{{ notification.created_at|date:"d M Y, h:i A" }}</small>
+                            </div>
+                            <div class="text-md-right">
+                                {% if notification.task %}
+                                <a href="{% url 'tasks:detail' notification.task.id %}" class="btn btn-sm btn-primary mb-2"><i class="fas fa-arrow-up-right-from-square mr-1"></i>Open Task</a>
+                                {% endif %}
+                                {% if not notification.is_read %}
+                                <a href="{% url 'notifications:mark_read' notification.id %}" class="btn btn-sm btn-outline-secondary mb-2"><i class="fas fa-check mr-1"></i>Mark as Read</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state"><i class="fas fa-bell-slash fa-2x mb-3"></i><div>No notifications found.</div></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

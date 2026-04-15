@@ -1,0 +1,111 @@
+{% extends "base/dashboard_base.html" %}
+
+{% block title %}Task Detail{% endblock %}
+{% block page_title %}Task Detail{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'tasks:my_tasks' %}">Tasks</a></li>
+<li class="breadcrumb-item active">Task Detail</li>
+{% endblock %}
+
+{% block page_actions %}
+{% if can_manage_task %}
+<a href="{% url 'tasks:edit' task.id %}" class="btn btn-primary"><i class="fas fa-pen mr-1"></i>Edit Task</a>
+{% endif %}
+<a href="{% url 'tasks:my_tasks' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i>Back to Tasks</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-8">
+        <div class="card mb-4">
+            <div class="card-header border-0">
+                <h3 class="card-title"><i class="fas fa-clipboard-check mr-2 text-primary"></i>{{ task.title }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Department</div><div class="value">{{ task.department|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Category</div><div class="value">{{ task.category|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Priority</div><div class="value"><span class="badge status-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span></div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Status</div><div class="value"><span class="badge status-badge status-{{ task.status }}">{{ task.get_status_display }}</span></div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Task Type</div><div class="value">{{ task.get_task_type_display }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Created By</div><div class="value">{{ task.created_by.full_name|default:task.created_by.username|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Due Date</div><div class="value">{{ task.due_date|date:"d M Y, h:i A"|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Estimated Hours</div><div class="value">{{ task.estimated_hours|default:"-" }}</div></div></div>
+                </div>
+
+                <div class="mini-stat mb-3"><div class="label">Description</div><div class="value">{{ task.description|linebreaksbr }}</div></div>
+                <div class="mini-stat mb-3"><div class="label">Approval Note</div><div class="value">{{ task.approval_note|default:"-"|linebreaksbr }}</div></div>
+                <div class="mini-stat mb-3"><div class="label">Internal Note</div><div class="value">{{ task.internal_note|default:"-"|linebreaksbr }}</div></div>
+                <div class="mini-stat"><div class="label">Rejection Reason</div><div class="value">{{ task.rejection_reason|default:"-"|linebreaksbr }}</div></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header border-0">
+                <h3 class="card-title"><i class="fas fa-users mr-2 text-info"></i>Assigned Users</h3>
+            </div>
+            <div class="card-body">
+                {% for assignment in assignments %}
+                <div class="mini-stat mb-3">
+                    <div class="label">Assignee</div>
+                    <div class="value">
+                        {{ assignment.assigned_to.full_name|default:assignment.assigned_to.username }}
+                        {% if assignment.is_primary %}<span class="badge badge-primary ml-2">Primary</span>{% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state py-4"><i class="fas fa-user-slash fa-2x mb-3"></i><div>No assignments yet.</div></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        {% if can_manage_task %}
+        <div class="card management-panel mb-4">
+            <div class="card-header border-0"><h3 class="card-title"><i class="fas fa-calendar-day mr-2 text-warning"></i>Update Deadline</h3></div>
+            <div class="card-body">
+                <form method="post" action="{% url 'tasks:update_deadline' task.id %}">
+                    {% csrf_token %}
+                    {{ deadline_form.due_date }}
+                    <button type="submit" class="btn btn-warning btn-block mt-3"><i class="fas fa-save mr-1"></i>Update Deadline</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card management-panel mb-4">
+            <div class="card-header border-0"><h3 class="card-title"><i class="fas fa-flag mr-2 text-danger"></i>Update Priority</h3></div>
+            <div class="card-body">
+                <form method="post" action="{% url 'tasks:update_priority' task.id %}">
+                    {% csrf_token %}
+                    {{ priority_form.priority }}
+                    <button type="submit" class="btn btn-danger btn-block mt-3"><i class="fas fa-save mr-1"></i>Update Priority</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card management-panel mb-4">
+            <div class="card-header border-0"><h3 class="card-title"><i class="fas fa-arrows-rotate mr-2 text-primary"></i>Update Status</h3></div>
+            <div class="card-body">
+                <form method="post" action="{% url 'tasks:update_status' task.id %}">
+                    {% csrf_token %}
+                    {{ status_form.status }}
+                    <button type="submit" class="btn btn-primary btn-block mt-3"><i class="fas fa-save mr-1"></i>Update Status</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header border-0"><h3 class="card-title"><i class="fas fa-circle-info mr-2 text-secondary"></i>Task Summary</h3></div>
+            <div class="card-body">
+                <div class="mini-stat mb-3"><div class="label">Created At</div><div class="value">{{ task.created_at|date:"d M Y, h:i A" }}</div></div>
+                <div class="mini-stat mb-3"><div class="label">Last Updated</div><div class="value">{{ task.updated_at|date:"d M Y, h:i A" }}</div></div>
+                <div class="mini-stat"><div class="label">Owner</div><div class="value">{{ task.created_by.email }}</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

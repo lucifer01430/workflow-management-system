@@ -1,0 +1,11 @@
+{% extends "emails/base_email.html" %}
+
+{% block body %}
+<p style="margin:0 0 18px;font-size:15px;line-height:1.7;">A new task is waiting in the approval workflow.</p>
+<div style="padding:18px;border:1px solid #dde3ea;border-radius:10px;background:#f8fafc;">
+    <div><strong>Task:</strong> {{ task.title }}</div>
+    <div><strong>Created By:</strong> {{ created_by_name }}</div>
+    <div><strong>Priority:</strong> {{ task.get_priority_display }}</div>
+    <div><strong>Department:</strong> {{ task.department|default:"-" }}</div>
+</div>
+{% endblock %}

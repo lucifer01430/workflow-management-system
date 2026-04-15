@@ -1,0 +1,16 @@
+Workflow Management System
+
+Hello {{ recipient_name }},
+
+{{ heading }}
+
+Task: {{ task.title }}
+Department: {{ task.department|default:"-" }}
+Rejected By: {{ actor_name|default:"System" }}
+Reason: {{ rejection_reason }}
+
+{{ action_copy }}
+
+Workflow Management System
+Designed & Developed by Harsh
+Portfolio: https://lucifer01430.github.io/Portfolio

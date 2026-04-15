@@ -1,0 +1,9 @@
+{% extends "emails/base_email.html" %}
+
+{% block body %}
+<p style="margin:0 0 18px;font-size:15px;line-height:1.7;">Your account request could not be approved.</p>
+<div style="padding:18px;border:1px solid #dde3ea;border-radius:10px;background:#f8fafc;">
+    <div><strong>Email:</strong> {{ email }}</div>
+    <div><strong>Reason:</strong> {{ rejection_reason|default:"No reason provided" }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+Workflow Management System
+
+Hello {{ recipient_name }},
+
+{{ heading }}
+
+Task: {{ task.title }}
+Priority: {{ task.get_priority_display }}
+Department: {{ task.department|default:"-" }}
+Approved By: {{ actor_name|default:"System" }}
+
+{{ action_copy }}
+
+Workflow Management System
+Designed & Developed by Harsh
+Portfolio: https://lucifer01430.github.io/Portfolio

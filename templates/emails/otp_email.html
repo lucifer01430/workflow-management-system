@@ -1,0 +1,11 @@
+{% extends "emails/base_email.html" %}
+
+{% block body %}
+<p style="margin:0 0 18px;font-size:15px;line-height:1.7;">Use the one-time password below to complete your email verification.</p>
+<div style="margin:18px 0;padding:18px;border:1px solid #dde3ea;border-radius:10px;background:#f8fafc;text-align:center;">
+    <div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#6c757d;">Your OTP</div>
+    <div style="font-size:34px;font-weight:700;letter-spacing:0.18em;color:#213448;margin-top:8px;">{{ otp }}</div>
+</div>
+<p style="margin:0;font-size:14px;line-height:1.7;">This OTP is valid for {{ expires_in_minutes }} minutes.</p>
+<p style="margin:14px 0 0;font-size:14px;line-height:1.7;color:#5d6b79;">{{ support_note }}</p>
+{% endblock %}

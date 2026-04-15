@@ -2,15 +2,16 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.db import transaction
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from apps.accounts.forms import EmailLoginForm, OTPVerificationForm, RegisterForm
+from apps.accounts.forms import EmailLoginForm, OTPVerificationForm, ProfileUpdateForm, RegisterForm
 from apps.accounts.models import EmailOTP, RegistrationStatus, User
-from apps.accounts.utils import create_and_send_otp
+from apps.accounts.utils import create_and_send_otp, get_reporting_contacts
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,11 @@ def register_view(request):
                 return redirect("accounts:verify_otp", user_id=user.id)
 
             except Exception as exc:
-                logger.exception("Registration failed during OTP delivery for email=%s: %s", form.cleaned_data.get("email"), exc)
+                logger.exception(
+                    "Registration failed during OTP delivery for email=%s: %s",
+                    form.cleaned_data.get("email"),
+                    exc,
+                )
                 print(f"[REGISTER ERROR] email={form.cleaned_data.get('email')} error={exc}")
                 messages.error(
                     request,
@@ -140,6 +145,40 @@ class UserLoginView(LoginView):
         login(self.request, user)
         messages.success(self.request, "Login successful.")
         return redirect("dashboard:home")
+
+
+@login_required
+def profile_view(request):
+    reporting_hod, reporting_gm = get_reporting_contacts(request.user)
+    return render(
+        request,
+        "accounts/profile.html",
+        {
+            "reporting_hod": reporting_hod,
+            "reporting_gm": reporting_gm,
+        },
+    )
+
+
+@login_required
+def profile_update_view(request):
+    if request.method == "POST":
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully.")
+            return redirect("accounts:profile")
+        messages.error(request, "Please correct the highlighted fields and try again.")
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+
+    return render(
+        request,
+        "accounts/profile_update.html",
+        {
+            "form": form,
+        },
+    )
 
 
 def logout_view(request):
