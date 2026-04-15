@@ -1,6 +1,7 @@
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "apps.core",
     "apps.accounts",
     "apps.departments",
@@ -110,18 +110,23 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend",
+)
 EMAIL_HOST = os.getenv("EMAIL_HOST", "")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@example.com")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 
 # Login / Logout redirects
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
@@ -134,25 +139,20 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
     "welcome_sign": "Welcome to Workflow Management System Admin Panel",
     "copyright": "Designed & Developed by Harsh",
-
     "search_model": ["accounts.User", "departments.Department", "departments.Designation"],
-
     "topmenu_links": [
         {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"model": "accounts.User"},
         {"model": "departments.Department"},
         {"model": "departments.Designation"},
     ],
-
     "usermenu_links": [
         {"name": "View Site", "url": "/", "new_window": False},
     ],
-
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
     "hide_models": [],
-
     "order_with_respect_to": [
         "accounts",
         "departments",
@@ -164,7 +164,6 @@ JAZZMIN_SETTINGS = {
         "reports",
         "auditlogs",
     ],
-
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.Group": "fas fa-users",
@@ -180,19 +179,14 @@ JAZZMIN_SETTINGS = {
         "auditlogs": "fas fa-history",
         "accounts.EmailOTP": "fas fa-envelope-open-text",
     },
-
     "default_icon_parents": "fas fa-folder",
     "default_icon_children": "fas fa-circle",
-
     "related_modal_active": True,
     "custom_css": None,
     "custom_js": None,
-
     "show_ui_builder": False,
-
     "changeform_format": "horizontal_tabs",
 }
-
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -201,4 +195,23 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO" if DEBUG else "WARNING",
+    },
+    "loggers": {
+        "apps.accounts": {
+            "handlers": ["console"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+    },
+}

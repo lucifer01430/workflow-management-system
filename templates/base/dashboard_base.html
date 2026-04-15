@@ -1,0 +1,359 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard | Workflow Management System{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <style>
+        :root {
+            --wms-sidebar: #213448;
+            --wms-sidebar-accent: #1a2836;
+            --wms-brand: #c8953d;
+            --wms-surface: #f4f6f9;
+        }
+
+        body {
+            font-family: "Source Sans 3", sans-serif;
+        }
+
+        .layout-fixed .main-sidebar {
+            background: linear-gradient(180deg, var(--wms-sidebar) 0%, var(--wms-sidebar-accent) 100%);
+        }
+
+        .brand-link {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .brand-link .brand-text {
+            font-weight: 600;
+            white-space: normal;
+            line-height: 1.2;
+        }
+
+        .user-panel img {
+            object-fit: cover;
+        }
+
+        .main-header.navbar {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .content-wrapper {
+            background: var(--wms-surface);
+        }
+
+        .content-header h1 {
+            font-weight: 600;
+        }
+
+        .role-badge {
+            background-color: rgba(200, 149, 61, 0.15);
+            color: #f5d89b;
+            border: 1px solid rgba(200, 149, 61, 0.35);
+        }
+
+        .nav-sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .main-footer {
+            font-size: 0.95rem;
+        }
+
+        .sidebar-search input {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .sidebar-search input::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+
+            <form class="form-inline ml-3 d-none d-md-flex">
+                <div class="input-group input-group-sm">
+                    <input class="form-control form-control-navbar" type="search" placeholder="Search modules, tasks, users..." aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-navbar" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-bell"></i>
+                        <span class="badge badge-warning navbar-badge">0</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <span class="dropdown-header">Notifications</span>
+                        <div class="dropdown-divider"></div>
+                        <span class="dropdown-item text-muted">Notification center placeholder</span>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
+                        <span class="mr-2">{{ request.user.full_name|default:request.user.username|default:"User" }}</span>
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <span class="dropdown-item-text">
+                            <strong>{{ request.user.email|default:"No email available" }}</strong>
+                        </span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-id-badge mr-2"></i> My Profile
+                        </a>
+                        <a href="{% url 'accounts:logout' %}" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="{% url 'dashboard:home' %}" class="brand-link">
+                <i class="fas fa-sitemap brand-image text-warning" style="opacity: .9; margin-top: .2rem;"></i>
+                <span class="brand-text text-white">Workflow Management System</span>
+            </a>
+
+            <div class="sidebar">
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        {% if request.user.is_authenticated and request.user.profile_image %}
+                            <img src="{{ request.user.profile_image.url }}" class="img-circle elevation-2" alt="User Image">
+                        {% else %}
+                            <img src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        {% endif %}
+                    </div>
+                    <div class="info">
+                        <a href="#" class="d-block text-white">{{ request.user.full_name|default:request.user.username|default:"User" }}</a>
+                        <span class="badge role-badge mt-2">{{ request.user.get_role_display|default:"Role Pending" }}</span>
+                    </div>
+                </div>
+
+                <div class="form-inline sidebar-search mb-3">
+                    <div class="input-group" data-widget="sidebar-search">
+                        <input class="form-control form-control-sidebar" type="search" placeholder="Quick search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn btn-sidebar">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-legacy" data-widget="treeview" role="menu" data-accordion="false">
+                        {% if request.user.is_superuser or request.user.role == 'super_admin' %}
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard:home' %}" class="nav-link active">
+                                    <i class="nav-icon fas fa-gauge-high"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-user"></i>
+                                    <p>My Profile</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-list-check"></i>
+                                    <p>Tasks</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-file-signature"></i>
+                                    <p>Approvals</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-chart-line"></i>
+                                    <p>Reports</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-bell"></i>
+                                    <p>Notifications</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-users-cog"></i>
+                                    <p>User Management</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>Departments</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-gear"></i>
+                                    <p>Settings</p>
+                                </a>
+                            </li>
+                        {% elif request.user.role == 'general_manager' %}
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard:home' %}" class="nav-link active">
+                                    <i class="nav-icon fas fa-gauge-high"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-file-signature"></i>
+                                    <p>Approvals</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-chart-line"></i>
+                                    <p>Reports</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-bell"></i>
+                                    <p>Notifications</p>
+                                </a>
+                            </li>
+                        {% elif request.user.role == 'hod' %}
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard:home' %}" class="nav-link active">
+                                    <i class="nav-icon fas fa-gauge-high"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-list-check"></i>
+                                    <p>Tasks</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-file-signature"></i>
+                                    <p>Approvals</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-chart-line"></i>
+                                    <p>Reports</p>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a href="{% url 'dashboard:home' %}" class="nav-link active">
+                                    <i class="nav-icon fas fa-gauge-high"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-user"></i>
+                                    <p>My Profile</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-list-check"></i>
+                                    <p>Tasks</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-bell"></i>
+                                    <p>Notifications</p>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">{% block page_title %}Dashboard{% endblock %}</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                {% block breadcrumbs %}
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+                                    <li class="breadcrumb-item active">Dashboard</li>
+                                {% endblock %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="content">
+                <div class="container-fluid">
+                    {% if messages %}
+                        <div class="row">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% block content %}{% endblock %}
+                </div>
+            </section>
+        </div>
+
+        <footer class="main-footer">
+            <strong>Designed &amp; Developed by Harsh</strong>
+            <div class="float-right d-none d-sm-inline-block">
+                Internal workflow platform
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

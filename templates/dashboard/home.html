@@ -1,44 +1,252 @@
-{% extends "base/base.html" %}
+{% extends "base/dashboard_base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard Home | Workflow Management System{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+    <li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="p-4 bg-light rounded-3 shadow-sm">
-            <h2 class="mb-2">Welcome, {{ request.user.full_name|default:request.user.username }}</h2>
-            <p class="mb-1"><strong>Email:</strong> {{ request.user.email }}</p>
-            <p class="mb-1"><strong>Role:</strong> {{ request.user.get_role_display }}</p>
-            <p class="mb-1"><strong>Department:</strong> {{ request.user.department|default:"Not assigned" }}</p>
-            <p class="mb-0"><strong>Designation:</strong> {{ request.user.designation|default:"Not assigned" }}</p>
+        <div class="card card-outline card-primary">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h2 class="h3 mb-2">Welcome, {{ request.user.full_name|default:request.user.username|default:"Team Member" }}</h2>
+                        <p class="text-muted mb-0">This workspace centralizes task execution, approvals, employee coordination, and operational reporting.</p>
+                    </div>
+                    <div class="col-lg-4 mt-3 mt-lg-0">
+                        <div class="row">
+                            <div class="col-sm-6 mb-2">
+                                <div class="border rounded p-3 bg-light h-100">
+                                    <div class="text-muted small">Email</div>
+                                    <div class="font-weight-semibold">{{ request.user.email|default:"Not available" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <div class="border rounded p-3 bg-light h-100">
+                                    <div class="text-muted small">Role</div>
+                                    <div class="font-weight-semibold">{{ request.user.get_role_display|default:"Not assigned" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-4 col-xl-2 mb-3">
+                        <div class="border rounded p-3 bg-white h-100">
+                            <div class="text-muted small">Department</div>
+                            <div class="font-weight-semibold">{{ request.user.department|default:"Not assigned" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2 mb-3">
+                        <div class="border rounded p-3 bg-white h-100">
+                            <div class="text-muted small">Designation</div>
+                            <div class="font-weight-semibold">{{ request.user.designation|default:"Not assigned" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2 mb-3">
+                        <div class="border rounded p-3 bg-white h-100">
+                            <div class="text-muted small">Full Name</div>
+                            <div class="font-weight-semibold">{{ request.user.full_name|default:request.user.username|default:"Not available" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2 mb-3">
+                        <div class="border rounded p-3 bg-white h-100">
+                            <div class="text-muted small">Status</div>
+                            <div class="font-weight-semibold">Active Workspace</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2 mb-3">
+                        <div class="border rounded p-3 bg-white h-100">
+                            <div class="text-muted small">Approvals</div>
+                            <div class="font-weight-semibold">Operational</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2 mb-3">
+                        <div class="border rounded p-3 bg-white h-100">
+                            <div class="text-muted small">Notifications</div>
+                            <div class="font-weight-semibold">Monitored</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Profile Status</h5>
-                <p class="card-text">Your account is active and ready to use.</p>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ total_tasks|default:"0" }}</h3>
+                <p>Total Tasks</p>
+            </div>
+            <div class="icon"><i class="fas fa-list-check"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{ pending_tasks|default:"0" }}</h3>
+                <p>Pending Tasks</p>
+            </div>
+            <div class="icon"><i class="fas fa-clock"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ completed_tasks|default:"0" }}</h3>
+                <p>Completed Tasks</p>
+            </div>
+            <div class="icon"><i class="fas fa-circle-check"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>{{ pending_approvals|default:"0" }}</h3>
+                <p>Pending Approvals</p>
+            </div>
+            <div class="icon"><i class="fas fa-file-signature"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-6">
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3>{{ notifications_count|default:"0" }}</h3>
+                <p>Notifications</p>
+            </div>
+            <div class="icon"><i class="fas fa-bell"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Assigned Tasks</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover text-nowrap mb-0">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Priority</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Assigned tasks table placeholder for upcoming task integration.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Quick Actions</h3>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Task Module</h5>
-                <p class="card-text">Task features will appear here in the next phase.</p>
+                <div class="btn-group-vertical d-flex">
+                    <a href="#" class="btn btn-outline-primary text-left mb-2"><i class="fas fa-plus mr-2"></i>Create Task Placeholder</a>
+                    <a href="#" class="btn btn-outline-success text-left mb-2"><i class="fas fa-check-double mr-2"></i>Review Approvals Placeholder</a>
+                    <a href="#" class="btn btn-outline-secondary text-left mb-2"><i class="fas fa-chart-column mr-2"></i>View Reports Placeholder</a>
+                    <a href="#" class="btn btn-outline-dark text-left"><i class="fas fa-user-gear mr-2"></i>Manage Profile Placeholder</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Activity</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">Recent activity placeholder for audit entries, workflow events, and team actions.</p>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Pending Approvals</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Department</th>
+                                <th>Requested By</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Pending approvals table placeholder for future approval workflow data.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Department Performance Summary</h3>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Notifications</h5>
-                <p class="card-text">Important approvals and updates will show here.</p>
+                <div class="row text-center">
+                    <div class="col-sm-4 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">Task Completion</div>
+                            <div class="h4 mb-0">--</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">Approval Turnaround</div>
+                            <div class="h4 mb-0">--</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">Department Load</div>
+                            <div class="h4 mb-0">--</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mb-0">Department metrics placeholder for future operational reporting widgets.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Notifications</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">Recent notifications placeholder for upcoming announcement, task alert, and reminder integrations.</p>
             </div>
         </div>
     </div>

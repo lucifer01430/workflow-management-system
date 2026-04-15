@@ -1,29 +1,57 @@
-{% extends "base/base.html" %}
+{% extends "base/public_base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Register | Workflow Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm">
+<div class="row justify-content-center py-lg-4">
+    <div class="col-xl-9 col-lg-10">
+        <div class="text-center mb-4">
+            <h1 class="h3 fw-bold mb-2">Create your employee account</h1>
+            <p class="text-muted mb-0">Register once to begin the approval and onboarding workflow for the system.</p>
+        </div>
+
+        <div class="card auth-card">
             <div class="card-header">
-                <h3 class="mb-0">Register</h3>
+                <h2 class="h4 mb-1">Registration Form</h2>
+                <p class="text-muted mb-0">Complete all required employee details. Your email will be verified through OTP.</p>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
-                    <div class="row">
+                    <div class="row g-3">
                         {% for field in form %}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ field.label }}</label>
+                            <div class="{% if field.name == 'profile_image' %}col-12{% else %}col-md-6{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
                                 {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
                                 {% if field.errors %}
-                                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                                    <div class="text-danger small mt-1">
+                                        {% for error in field.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
                                 {% endif %}
                             </div>
                         {% endfor %}
                     </div>
-                    <button type="submit" class="btn btn-primary">Register & Send OTP</button>
+
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4 pt-2 border-top">
+                        <p class="text-muted mb-0">Already registered? Continue to the sign in page.</p>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary">Login</a>
+                            <button type="submit" class="btn btn-brand">Register &amp; Send OTP</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

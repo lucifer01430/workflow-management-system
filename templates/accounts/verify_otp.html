@@ -1,27 +1,63 @@
-{% extends "base/base.html" %}
+{% extends "base/public_base.html" %}
 
-{% block title %}Verify OTP{% endblock %}
+{% block title %}Verify OTP | Workflow Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm">
+<div class="row justify-content-center align-items-center py-lg-4">
+    <div class="col-lg-5 col-md-7">
+        <div class="text-center mb-4">
+            <h1 class="h3 fw-bold mb-2">Email verification</h1>
+            <p class="text-muted mb-0">Enter the one-time password sent to your registered email address.</p>
+        </div>
+
+        <div class="card auth-card">
             <div class="card-header">
-                <h3 class="mb-0">Verify OTP</h3>
+                <h2 class="h4 mb-1">Verify OTP</h2>
+                <p class="text-muted mb-0">Verification email: <strong>{{ user_obj.email }}</strong></p>
             </div>
             <div class="card-body">
-                <p class="mb-3">
-                    Enter the OTP sent to <strong>{{ user_obj.email }}</strong>
-                </p>
-                <form method="post">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
                     {% csrf_token %}
-                    {{ form.otp_code.label_tag }}
-                    {{ form.otp_code }}
-                    {% if form.otp_code.errors %}
-                        <div class="text-danger small mt-1">{{ form.otp_code.errors|striptags }}</div>
-                    {% endif %}
-                    <button type="submit" class="btn btn-success w-100 mt-3">Verify OTP</button>
+                    <div class="mb-3">
+                        <label for="{{ form.otp_code.id_for_label }}" class="form-label fw-semibold">{{ form.otp_code.label }}</label>
+                        {{ form.otp_code }}
+                        <div class="form-text">Provide the 6-digit OTP exactly as received in your inbox.</div>
+                        {% if form.otp_code.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.otp_code.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-brand w-100">Verify OTP</button>
                 </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted d-block mb-2">Didn&apos;t receive the OTP?</small>
+                    <form method="post" action="{% url 'accounts:resend_otp' user_obj.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                            Resend OTP
+                        </button>
+                    </form>
+                </div>
+
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        Verified already?
+                        <a href="{% url 'accounts:login' %}" class="text-decoration-none">Return to login</a>
+                    </small>
+                </div>
             </div>
         </div>
     </div>
