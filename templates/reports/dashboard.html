@@ -1,0 +1,175 @@
+{% extends "base/dashboard_base.html" %}
+
+{% block title %}Reports Dashboard{% endblock %}
+{% block page_title %}Reports Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ total_tasks }}</h3>
+                <p>Total Tasks</p>
+            </div>
+            <div class="icon"><i class="fas fa-list-check"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ completed_tasks }}</h3>
+                <p>Completed / Closed</p>
+            </div>
+            <div class="icon"><i class="fas fa-circle-check"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{ pending_tasks }}</h3>
+                <p>Pending / Active</p>
+            </div>
+            <div class="icon"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>{{ overdue_tasks }}</h3>
+                <p>Overdue Tasks</p>
+            </div>
+            <div class="icon"><i class="fas fa-triangle-exclamation"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header border-0">
+        <h3 class="card-title"><i class="fas fa-filter mr-2 text-primary"></i>Filters</h3>
+    </div>
+    <div class="card-body">
+        <form method="get">
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Department</label>
+                    <select name="department" class="form-select">
+                        <option value="">All</option>
+                        {% for department in departments %}
+                        <option value="{{ department.id }}" {% if request.GET.department == department.id|stringformat:"s" %}selected{% endif %}>
+                            {{ department }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Employee</label>
+                    <select name="employee" class="form-select">
+                        <option value="">All</option>
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}" {% if request.GET.employee == employee.id|stringformat:"s" %}selected{% endif %}>
+                            {{ employee.full_name|default:employee.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Priority</label>
+                    <select name="priority" class="form-select">
+                        <option value="">All</option>
+                        {% for value, label in priority_choices %}
+                        <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Task Type</label>
+                    <select name="task_type" class="form-select">
+                        <option value="">All</option>
+                        {% for value, label in task_type_choices %}
+                        <option value="{{ value }}" {% if request.GET.task_type == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search mr-1"></i>Apply Filters
+            </button>
+            <a href="{% url 'reports:dashboard' %}" class="btn btn-outline-secondary">Reset</a>
+            <a href="{% url 'reports:export_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success">
+                <i class="fas fa-file-excel mr-1"></i>Export Excel
+            </a>
+            <a href="{% url 'reports:export_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-danger">
+                <i class="fas fa-file-pdf mr-1"></i>Export PDF
+            </a>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header border-0">
+        <h3 class="card-title"><i class="fas fa-table mr-2 text-info"></i>Task Report</h3>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Department</th>
+                    <th>Category</th>
+                    <th>Task Type</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                    <th>Due Date</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{ task.id }}</td>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.department|default:"-" }}</td>
+                    <td>{{ task.category|default:"-" }}</td>
+                    <td>{{ task.get_task_type_display }}</td>
+                    <td>{{ task.get_priority_display }}</td>
+                    <td>{{ task.get_status_display }}</td>
+                    <td>{{ task.created_by.full_name|default:task.created_by.username }}</td>
+                    <td>{{ task.due_date|date:"d M Y, h:i A"|default:"-" }}</td>
+                    <td>{{ task.created_at|date:"d M Y, h:i A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">No report data found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
