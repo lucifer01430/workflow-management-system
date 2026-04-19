@@ -28,6 +28,12 @@ class TaskStatus(models.TextChoices):
     CANCELLED = "cancelled", "Cancelled"
 
 
+class ExtensionRequestStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
+
+
 class TaskCategory(models.Model):
     name = models.CharField(max_length=150, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -68,7 +74,6 @@ class Task(models.Model):
         choices=TaskStatus.choices,
         default=TaskStatus.DRAFT,
     )
-
     department = models.ForeignKey(
         "departments.Department",
         on_delete=models.SET_NULL,
@@ -76,13 +81,11 @@ class Task(models.Model):
         null=True,
         related_name="tasks",
     )
-
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="created_tasks",
     )
-
     requires_gm_approval = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
 
@@ -110,6 +113,9 @@ class Task(models.Model):
     )
     rejected_at = models.DateTimeField(blank=True, null=True)
     rejection_reason = models.TextField(blank=True, null=True)
+
+    completed_at = models.DateTimeField(blank=True, null=True)
+    closed_at = models.DateTimeField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -151,3 +157,62 @@ class TaskAssignment(models.Model):
 
     def __str__(self):
         return f"{self.task.title} -> {self.assigned_to.full_name or self.assigned_to.username}"
+
+
+class TaskProgressUpdate(models.Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name="progress_updates",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="task_progress_updates",
+    )
+    status = models.CharField(max_length=30, choices=TaskStatus.choices)
+    note = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.task.title} - {self.get_status_display()}"
+
+
+class DeadlineExtensionRequest(models.Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name="extension_requests",
+    )
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="deadline_extension_requests",
+    )
+    current_due_date = models.DateTimeField(blank=True, null=True)
+    requested_due_date = models.DateTimeField()
+    reason = models.TextField()
+    status = models.CharField(
+        max_length=20,
+        choices=ExtensionRequestStatus.choices,
+        default=ExtensionRequestStatus.PENDING,
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="reviewed_extension_requests",
+    )
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    review_note = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Extension Request - {self.task.title}"

@@ -1,21 +1,19 @@
 from django.db import transaction
 from django.utils import timezone
 
-from apps.accounts.models import UserRole
+from apps.accounts.models import User, UserRole
 from apps.auditlogs.utils import log_activity
 from apps.notifications.models import NotificationType
 from apps.notifications.utils import create_notification, send_action_email
-from apps.tasks.models import TaskAssignment, TaskStatus, TaskType
-
-
-def _email_context(recipient_name, task, **extra):
-    context = {
-        "recipient_name": recipient_name,
-        "task": task,
-        "software_name": "Workflow Management System",
-    }
-    context.update(extra)
-    return context
+from apps.tasks.models import (
+    DeadlineExtensionRequest,
+    ExtensionRequestStatus,
+    Task,
+    TaskAssignment,
+    TaskProgressUpdate,
+    TaskStatus,
+    TaskType,
+)
 
 
 @transaction.atomic
@@ -68,14 +66,6 @@ def create_task_with_workflow(*, form, created_by):
                     f"Please check your dashboard for details."
                 ),
                 recipient_list=[user.email],
-                html_template="emails/task_assigned_email.html",
-                text_template="emails/task_assigned_email.txt",
-                context=_email_context(
-                    user.full_name or user.username,
-                    task,
-                    heading="New Task Assigned",
-                    action_copy="Please check your dashboard to review the task details and due date.",
-                ),
             )
 
         log_activity(
@@ -87,8 +77,6 @@ def create_task_with_workflow(*, form, created_by):
         )
 
     elif task.task_type == TaskType.APPROVAL:
-        from apps.accounts.models import User
-
         gm_users = User.objects.filter(
             role__in=[UserRole.GENERAL_MANAGER, UserRole.SUPER_ADMIN],
             is_active=True,
@@ -115,15 +103,6 @@ def create_task_with_workflow(*, form, created_by):
                     f"Please review it from the system dashboard."
                 ),
                 recipient_list=[gm.email],
-                html_template="emails/task_approval_required_email.html",
-                text_template="emails/task_approval_required_email.txt",
-                context=_email_context(
-                    gm.full_name or gm.username,
-                    task,
-                    heading="Task Approval Required",
-                    action_copy="A new task is waiting in the approval inbox for your review.",
-                    created_by_name=created_by.full_name or created_by.username,
-                ),
             )
 
         log_activity(
@@ -175,15 +154,6 @@ def approve_task(*, task, approved_by):
                     f"Please check your dashboard for details."
                 ),
                 recipient_list=[user.email],
-                html_template="emails/task_approved_email.html",
-                text_template="emails/task_approved_email.txt",
-                context=_email_context(
-                    user.full_name or user.username,
-                    task,
-                    heading="Task Approved and Assigned",
-                    action_copy="The approved task is now live in your dashboard.",
-                    actor_name=approved_by.full_name or approved_by.username,
-                ),
             )
 
     create_notification(
@@ -203,15 +173,6 @@ def approve_task(*, task, approved_by):
             f"You can now track it from your dashboard."
         ),
         recipient_list=[task.created_by.email],
-        html_template="emails/task_approved_email.html",
-        text_template="emails/task_approved_email.txt",
-        context=_email_context(
-            task.created_by.full_name or task.created_by.username,
-            task,
-            heading="Task Approved",
-            action_copy="You can now track task execution from your dashboard.",
-            actor_name=approved_by.full_name or approved_by.username,
-        ),
     )
 
     log_activity(
@@ -254,16 +215,6 @@ def reject_task(*, task, rejected_by, reason=""):
             f"Please review and update accordingly."
         ),
         recipient_list=[task.created_by.email],
-        html_template="emails/task_rejected_email.html",
-        text_template="emails/task_rejected_email.txt",
-        context=_email_context(
-            task.created_by.full_name or task.created_by.username,
-            task,
-            heading="Task Rejected",
-            action_copy="Please review the rejection reason and update the task details if needed.",
-            actor_name=rejected_by.full_name or rejected_by.username,
-            rejection_reason=reason or "No reason provided",
-        ),
     )
 
     log_activity(
@@ -275,3 +226,183 @@ def reject_task(*, task, rejected_by, reason=""):
     )
 
     return task
+
+
+@transaction.atomic
+def update_task_status(*, task, user, status, note=""):
+    task.status = status
+
+    if status == TaskStatus.COMPLETED:
+        task.completed_at = timezone.now()
+
+    task.save(update_fields=["status", "completed_at", "updated_at"])
+
+    TaskProgressUpdate.objects.create(
+        task=task,
+        updated_by=user,
+        status=status,
+        note=note,
+    )
+
+    recipients = []
+
+    if task.created_by and task.created_by != user:
+        recipients.append(task.created_by)
+
+    gm_users = User.objects.filter(
+        role__in=[UserRole.GENERAL_MANAGER, UserRole.SUPER_ADMIN],
+        is_active=True,
+        is_active_by_admin=True,
+        registration_status="approved",
+    ).exclude(id=user.id)
+
+    for gm in gm_users:
+        recipients.append(gm)
+
+    unique_recipients = {r.id: r for r in recipients}.values()
+
+    for recipient in unique_recipients:
+        create_notification(
+            recipient=recipient,
+            title="Task Status Updated",
+            message=f"Task '{task.title}' status changed to {task.get_status_display()}",
+            notification_type=NotificationType.TASK_UPDATED,
+            task=task,
+        )
+
+        send_action_email(
+            subject="Task Status Updated",
+            message=(
+                f"Hello {recipient.full_name},\n\n"
+                f"Task status has been updated.\n"
+                f"Task: {task.title}\n"
+                f"New Status: {task.get_status_display()}\n"
+                f"Updated By: {user.full_name}\n\n"
+                f"Please check the dashboard for details."
+            ),
+            recipient_list=[recipient.email],
+        )
+
+    log_activity(
+        actor=user,
+        action="task_status_updated",
+        target_model="Task",
+        target_id=task.id,
+        description=f"Task '{task.title}' status updated to {task.get_status_display()}",
+    )
+
+    return task
+
+
+@transaction.atomic
+def create_deadline_extension_request(*, task, requested_by, requested_due_date, reason):
+    request_obj = DeadlineExtensionRequest.objects.create(
+        task=task,
+        requested_by=requested_by,
+        current_due_date=task.due_date,
+        requested_due_date=requested_due_date,
+        reason=reason,
+    )
+
+    recipients = []
+
+    if task.created_by and task.created_by != requested_by:
+        recipients.append(task.created_by)
+
+    gm_users = User.objects.filter(
+        role__in=[UserRole.GENERAL_MANAGER, UserRole.SUPER_ADMIN],
+        is_active=True,
+        is_active_by_admin=True,
+        registration_status="approved",
+    ).exclude(id=requested_by.id)
+
+    for gm in gm_users:
+        recipients.append(gm)
+
+    unique_recipients = {r.id: r for r in recipients}.values()
+
+    for recipient in unique_recipients:
+        create_notification(
+            recipient=recipient,
+            title="Deadline Extension Requested",
+            message=f"Extension requested for task: {task.title}",
+            notification_type=NotificationType.EXTENSION_REQUESTED,
+            task=task,
+        )
+
+        send_action_email(
+            subject="Deadline Extension Requested",
+            message=(
+                f"Hello {recipient.full_name},\n\n"
+                f"A deadline extension has been requested.\n"
+                f"Task: {task.title}\n"
+                f"Current Due Date: {task.due_date}\n"
+                f"Requested Due Date: {requested_due_date}\n"
+                f"Requested By: {requested_by.full_name}\n"
+                f"Reason: {reason}\n\n"
+                f"Please review it from the dashboard."
+            ),
+            recipient_list=[recipient.email],
+        )
+
+    log_activity(
+        actor=requested_by,
+        action="deadline_extension_requested",
+        target_model="Task",
+        target_id=task.id,
+        description=f"Deadline extension requested for task '{task.title}'",
+    )
+
+    return request_obj
+
+
+@transaction.atomic
+def review_deadline_extension_request(*, extension_request, reviewed_by, status, review_note=""):
+    extension_request.status = status
+    extension_request.reviewed_by = reviewed_by
+    extension_request.reviewed_at = timezone.now()
+    extension_request.review_note = review_note
+    extension_request.save()
+
+    task = extension_request.task
+
+    if status == ExtensionRequestStatus.APPROVED:
+        task.due_date = extension_request.requested_due_date
+        task.save(update_fields=["due_date", "updated_at"])
+
+    notification_type = (
+        NotificationType.EXTENSION_APPROVED
+        if status == ExtensionRequestStatus.APPROVED
+        else NotificationType.EXTENSION_REJECTED
+    )
+
+    create_notification(
+        recipient=extension_request.requested_by,
+        title="Deadline Extension Reviewed",
+        message=f"Your extension request for '{task.title}' was {status}.",
+        notification_type=notification_type,
+        task=task,
+    )
+
+    send_action_email(
+        subject="Deadline Extension Reviewed",
+        message=(
+            f"Hello {extension_request.requested_by.full_name},\n\n"
+            f"Your deadline extension request has been {status}.\n"
+            f"Task: {task.title}\n"
+            f"Requested Due Date: {extension_request.requested_due_date}\n"
+            f"Review Note: {review_note or 'No note provided'}\n\n"
+            f"Please check your dashboard for details."
+        ),
+        recipient_list=[extension_request.requested_by.email],
+    )
+
+    log_activity(
+        actor=reviewed_by,
+        action="deadline_extension_reviewed",
+        target_model="DeadlineExtensionRequest",
+        target_id=extension_request.id,
+        description=f"Extension request for task '{task.title}' marked as {status}",
+    )
+
+    return extension_request

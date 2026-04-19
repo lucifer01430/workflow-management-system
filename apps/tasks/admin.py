@@ -1,7 +1,14 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from apps.tasks.models import Task, TaskAssignment, TaskCategory, TaskStatus
+from apps.tasks.models import (
+    DeadlineExtensionRequest,
+    Task,
+    TaskAssignment,
+    TaskCategory,
+    TaskProgressUpdate,
+    TaskStatus,
+)
 from apps.tasks.services import approve_task, reject_task
 
 
@@ -17,6 +24,13 @@ class TaskAssignmentInline(admin.TabularInline):
     model = TaskAssignment
     extra = 1
     autocomplete_fields = ("assigned_to", "assigned_by")
+
+
+class TaskProgressUpdateInline(admin.TabularInline):
+    model = TaskProgressUpdate
+    extra = 0
+    readonly_fields = ("updated_by", "status", "note", "created_at")
+    can_delete = False
 
 
 @admin.action(description="Approve selected pending tasks")
@@ -58,7 +72,7 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ("title", "description", "created_by__email", "created_by__full_name")
     ordering = ("-created_at",)
     autocomplete_fields = ("created_by", "department", "category", "approved_by", "rejected_by")
-    inlines = [TaskAssignmentInline]
+    inlines = [TaskAssignmentInline, TaskProgressUpdateInline]
     actions = [approve_selected_tasks, reject_selected_tasks]
 
     def priority_badge(self, obj):
@@ -114,3 +128,30 @@ class TaskAssignmentAdmin(admin.ModelAdmin):
     search_fields = ("task__title", "assigned_to__email", "assigned_to__full_name")
     ordering = ("-assigned_at",)
     autocomplete_fields = ("task", "assigned_to", "assigned_by")
+
+
+@admin.register(TaskProgressUpdate)
+class TaskProgressUpdateAdmin(admin.ModelAdmin):
+    list_display = ("id", "task", "updated_by", "status", "created_at")
+    list_filter = ("status", "created_at")
+    search_fields = ("task__title", "updated_by__email", "updated_by__full_name", "note")
+    ordering = ("-created_at",)
+    autocomplete_fields = ("task", "updated_by")
+
+
+@admin.register(DeadlineExtensionRequest)
+class DeadlineExtensionRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "task",
+        "requested_by",
+        "current_due_date",
+        "requested_due_date",
+        "status",
+        "reviewed_by",
+        "created_at",
+    )
+    list_filter = ("status", "created_at", "reviewed_at")
+    search_fields = ("task__title", "requested_by__email", "requested_by__full_name", "reason")
+    ordering = ("-created_at",)
+    autocomplete_fields = ("task", "requested_by", "reviewed_by")
