@@ -1,0 +1,18 @@
+Workflow Management System
+
+Hello {{ recipient_name }},
+
+{{ heading }}
+
+{{ intro }}
+
+{% for row in detail_rows %}{{ row.label }}: {{ row.value }}
+{% endfor %}
+
+{{ action_summary }}
+
+{{ footer_note }}
+
+Workflow Management System
+Designed & Developed by Harsh
+Portfolio: https://lucifer01430.github.io/Portfolio

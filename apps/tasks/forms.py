@@ -43,7 +43,10 @@ class TaskCreateForm(forms.ModelForm):
             "task_type": forms.Select(attrs={"class": "form-select"}),
             "priority": forms.Select(attrs={"class": "form-select"}),
             "department": forms.Select(attrs={"class": "form-select"}),
-            "due_date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+            "due_date": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
             "estimated_hours": forms.NumberInput(attrs={"class": "form-control", "step": "0.25"}),
             "approval_note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "internal_note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
@@ -56,10 +59,18 @@ class TaskCreateForm(forms.ModelForm):
         self.fields["department"].queryset = Department.objects.filter(is_active=True)
 
         self.fields["assigned_to"].queryset = self._get_assignable_users(user)
+        self.fields["due_date"].input_formats = ["%Y-%m-%dT%H:%M"]
+        if self.instance and self.instance.pk:
+            self.fields["assigned_to"].initial = self.instance.assignments.filter(is_active=True).values_list(
+                "assigned_to_id", flat=True
+            )
 
         if user and user.role == UserRole.HOD and user.department:
             self.fields["department"].initial = user.department
             self.fields["department"].disabled = True
+
+        if self.instance and self.instance.pk:
+            self.fields["task_type"].disabled = True
 
     def _get_assignable_users(self, user):
         if not user:
@@ -89,14 +100,73 @@ class TaskStatusUpdateForm(forms.ModelForm):
             "note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
 
+    def __init__(self, *args, manager=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if manager:
+            self.fields["status"].choices = [
+                (TaskStatus.ASSIGNED, "Assigned"),
+                (TaskStatus.NOT_STARTED, "Not Started"),
+                (TaskStatus.IN_PROGRESS, "In Progress"),
+                (TaskStatus.ON_HOLD, "On Hold"),
+                (TaskStatus.COMPLETED, "Completed"),
+                (TaskStatus.CLOSED, "Closed"),
+                (TaskStatus.CANCELLED, "Cancelled"),
+            ]
+        else:
+            self.fields["status"].choices = [
+                (TaskStatus.NOT_STARTED, "Not Started"),
+                (TaskStatus.IN_PROGRESS, "In Progress"),
+                (TaskStatus.ON_HOLD, "On Hold"),
+                (TaskStatus.COMPLETED, "Completed"),
+            ]
+
+
+class TaskDeadlineUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["due_date"]
+        widgets = {
+            "due_date": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["status"].choices = [
-            (TaskStatus.NOT_STARTED, "Not Started"),
-            (TaskStatus.IN_PROGRESS, "In Progress"),
-            (TaskStatus.ON_HOLD, "On Hold"),
-            (TaskStatus.COMPLETED, "Completed"),
-        ]
+        self.fields["due_date"].input_formats = ["%Y-%m-%dT%H:%M"]
+
+
+class TaskPriorityUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["priority"]
+        widgets = {
+            "priority": forms.Select(attrs={"class": "form-select"}),
+        }
+
+
+class TaskNoteUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["approval_note", "internal_note"]
+        widgets = {
+            "approval_note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "internal_note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        }
+
+
+class TaskRejectionForm(forms.Form):
+    reason = forms.CharField(
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Enter the reason for rejecting or declining this task.",
+            }
+        ),
+    )
 
 
 class DeadlineExtensionRequestForm(forms.ModelForm):
@@ -104,9 +174,16 @@ class DeadlineExtensionRequestForm(forms.ModelForm):
         model = DeadlineExtensionRequest
         fields = ["requested_due_date", "reason"]
         widgets = {
-            "requested_due_date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+            "requested_due_date": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
             "reason": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["requested_due_date"].input_formats = ["%Y-%m-%dT%H:%M"]
 
 
 class DeadlineExtensionReviewForm(forms.ModelForm):

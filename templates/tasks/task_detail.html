@@ -2,6 +2,7 @@
 
 {% block title %}Task Detail{% endblock %}
 {% block page_title %}Task Detail{% endblock %}
+{% block page_subtitle %}Task context, management actions, extension handling, and complete activity history in one professional workflow view.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -9,301 +10,337 @@
 <li class="breadcrumb-item active">Task Detail</li>
 {% endblock %}
 
+{% block page_actions %}
+<a href="{% url 'tasks:my_tasks' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i>Back to Tasks
+</a>
+{% if can_manage %}
+<a href="{% url 'tasks:edit' task.id %}" class="btn btn-primary">
+    <i class="fas fa-pen"></i>Edit Task
+</a>
+{% endif %}
+{% endblock %}
+
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Workflow record</span>
+        <h2>{{ task.title }}</h2>
+        <p>Review task information, manage workflow actions, inspect extension activity, and track the full action history without leaving the detail workspace.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ task.get_status_display }}</span>
+        <span>{{ task.get_priority_display }}</span>
+        <span>{{ task.get_task_type_display }}</span>
+        <span>{{ task.department|default:"No department" }}</span>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-xl-8 mb-4">
-        <div class="card">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-clipboard-check mr-2 text-primary"></i>{{ task.title }}
-                </h3>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-circle-info text-primary"></i>Task Information</h3>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Department</small>
-                            <div class="font-weight-bold">{{ task.department|default:"-" }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Category</small>
-                            <div class="font-weight-bold">{{ task.category|default:"-" }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Priority</small>
-                            <div class="font-weight-bold">{{ task.get_priority_display }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Status</small>
-                            <div class="font-weight-bold">{{ task.get_status_display }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Task Type</small>
-                            <div class="font-weight-bold">{{ task.get_task_type_display }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Created By</small>
-                            <div class="font-weight-bold">{{ task.created_by.full_name|default:task.created_by.username }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Due Date</small>
-                            <div class="font-weight-bold">{{ task.due_date|date:"d M Y, h:i A"|default:"-" }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100">
-                            <small class="text-muted d-block">Estimated Hours</small>
-                            <div class="font-weight-bold">{{ task.estimated_hours|default:"-" }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 mb-3">
-                        <div class="border rounded p-3">
-                            <small class="text-muted d-block">Description</small>
-                            <div class="font-weight-bold">{{ task.description|default:"-" }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 mb-3">
-                        <div class="border rounded p-3">
-                            <small class="text-muted d-block">Approval Note</small>
-                            <div class="font-weight-bold">{{ task.approval_note|default:"-" }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 mb-3">
-                        <div class="border rounded p-3">
-                            <small class="text-muted d-block">Internal Note</small>
-                            <div class="font-weight-bold">{{ task.internal_note|default:"-" }}</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="border rounded p-3">
-                            <small class="text-muted d-block">Rejection Reason</small>
-                            <div class="font-weight-bold">{{ task.rejection_reason|default:"-" }}</div>
-                        </div>
-                    </div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Department</div><div class="value">{{ task.department|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Category</div><div class="value">{{ task.category|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Priority</div><div class="value"><span class="badge status-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span></div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Status</div><div class="value"><span class="badge status-badge status-{{ task.status }}">{{ task.get_status_display }}</span></div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Task Type</div><div class="value">{{ task.get_task_type_display }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Created By</div><div class="value">{{ task.created_by.full_name|default:task.created_by.username }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Due Date</div><div class="value">{{ task.due_date|date:"d M Y, h:i A"|default:"-" }}</div></div></div>
+                    <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Estimated Hours</div><div class="value">{{ task.estimated_hours|default:"-" }}</div></div></div>
+                    <div class="col-12 mb-3"><div class="mini-stat"><div class="label">Description</div><div class="value">{{ task.description|linebreaksbr }}</div></div></div>
+                    <div class="col-12 mb-3"><div class="mini-stat"><div class="label">Approval Note</div><div class="value">{{ task.approval_note|default:"-"|linebreaksbr }}</div></div></div>
+                    <div class="col-12 mb-3"><div class="mini-stat"><div class="label">Internal Note</div><div class="value">{{ task.internal_note|default:"-"|linebreaksbr }}</div></div></div>
+                    <div class="col-12"><div class="mini-stat"><div class="label">Rejection Reason</div><div class="value">{{ task.rejection_reason|default:"-"|linebreaksbr }}</div></div></div>
                 </div>
             </div>
         </div>
 
-        {% if is_assigned_employee %}
-        <div class="card mt-4">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-pen mr-2 text-success"></i>Update Task Status
-                </h3>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-users text-info"></i>Assigned Users</h3>
             </div>
             <div class="card-body">
-                <form method="post" action="{% url 'tasks:update_status' task.id %}">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Status</label>
-                            {{ status_form.status }}
-                            {% if status_form.status.errors %}
-                                <div class="text-danger small mt-1">{{ status_form.status.errors|striptags }}</div>
-                            {% endif %}
+                {% if assignments %}
+                <div class="fd-surface-list">
+                    {% for assignment in assignments %}
+                    <div class="fd-surface-item">
+                        <div class="fd-surface-item__copy">
+                            <strong>{{ assignment.assigned_to.full_name|default:assignment.assigned_to.username }}</strong>
+                            <span>
+                                Assigned by {{ assignment.assigned_by.full_name|default:assignment.assigned_by.username|default:"System" }}
+                                on {{ assignment.assigned_at|date:"d M Y, h:i A" }}
+                            </span>
                         </div>
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">Note</label>
-                            {{ status_form.note }}
-                            {% if status_form.note.errors %}
-                                <div class="text-danger small mt-1">{{ status_form.note.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save mr-1"></i>Update Status
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-calendar-plus mr-2 text-warning"></i>Request Deadline Extension
-                </h3>
-            </div>
-            <div class="card-body">
-                <form method="post" action="{% url 'tasks:request_extension' task.id %}">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Requested Due Date</label>
-                            {{ extension_form.requested_due_date }}
-                            {% if extension_form.requested_due_date.errors %}
-                                <div class="text-danger small mt-1">{{ extension_form.requested_due_date.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">Reason</label>
-                            {{ extension_form.reason }}
-                            {% if extension_form.reason.errors %}
-                                <div class="text-danger small mt-1">{{ extension_form.reason.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-paper-plane mr-1"></i>Submit Request
-                    </button>
-                </form>
-            </div>
-        </div>
-        {% endif %}
-
-        {% if can_manage and extension_requests %}
-        <div class="card mt-4">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-calendar-check mr-2 text-danger"></i>Extension Requests
-                </h3>
-            </div>
-            <div class="card-body">
-                {% for item in extension_requests %}
-                <div class="border rounded p-3 mb-3">
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <small class="text-muted d-block">Requested By</small>
-                            <div class="font-weight-bold">{{ item.requested_by.full_name|default:item.requested_by.username }}</div>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <small class="text-muted d-block">Status</small>
-                            <div class="font-weight-bold text-capitalize">{{ item.status }}</div>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <small class="text-muted d-block">Current Due Date</small>
-                            <div class="font-weight-bold">{{ item.current_due_date|date:"d M Y, h:i A"|default:"-" }}</div>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <small class="text-muted d-block">Requested Due Date</small>
-                            <div class="font-weight-bold">{{ item.requested_due_date|date:"d M Y, h:i A" }}</div>
-                        </div>
-                        <div class="col-12 mb-3">
-                            <small class="text-muted d-block">Reason</small>
-                            <div class="font-weight-bold">{{ item.reason }}</div>
-                        </div>
-                    </div>
-
-                    {% if item.status == 'pending' %}
-                    <form method="post" action="{% url 'tasks:review_extension' item.id %}">
-                        {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label class="form-label">Review Decision</label>
-                            <select name="status" class="form-select">
-                                <option value="approved">Approve</option>
-                                <option value="rejected">Reject</option>
-                            </select>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">Review Note</label>
-                            <textarea name="review_note" rows="3" class="form-control" placeholder="Enter review note"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check mr-1"></i>Submit Review
-                        </button>
-                    </form>
-                    {% else %}
-                    <div class="mt-2">
-                        <small class="text-muted d-block">Reviewed By</small>
-                        <div class="font-weight-bold">{{ item.reviewed_by.full_name|default:item.reviewed_by.username|default:"-" }}</div>
-                        <small class="text-muted d-block mt-2">Review Note</small>
-                        <div class="font-weight-bold">{{ item.review_note|default:"-" }}</div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-        {% if progress_updates %}
-        <div class="card mt-4">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-clock-rotate-left mr-2 text-info"></i>Progress History
-                </h3>
-            </div>
-            <div class="card-body">
-                {% for update in progress_updates %}
-                <div class="border rounded p-3 mb-3">
-                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="font-weight-bold">{{ update.get_status_display }}</div>
-                            <div class="text-muted small">By {{ update.updated_by.full_name|default:update.updated_by.username }}</div>
+                            {% if assignment.is_primary %}
+                            <span class="badge badge-info">Primary</span>
+                            {% endif %}
                         </div>
-                        <small class="text-muted">{{ update.created_at|date:"d M Y, h:i A" }}</small>
                     </div>
-                    {% if update.note %}
-                    <div class="mt-2">{{ update.note }}</div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                {% else %}
+                <div class="fd-empty-state">
+                    <i class="fas fa-user-slash fa-2x mb-3 d-block"></i>
+                    <div>No active assignments yet.</div>
+                </div>
+                {% endif %}
             </div>
         </div>
-        {% endif %}
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-calendar-plus text-warning"></i>Extension Requests</h3>
+            </div>
+            <div class="card-body">
+                {% if extension_requests %}
+                <div class="fd-surface-list">
+                    {% for item in extension_requests %}
+                    <div class="fd-surface-item flex-column align-items-stretch">
+                        <div class="row">
+                            <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Requested By</div><div class="value">{{ item.requested_by.full_name|default:item.requested_by.username }}</div></div></div>
+                            <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Status</div><div class="value"><span class="badge status-badge status-{{ item.status }}">{{ item.status|title }}</span></div></div></div>
+                            <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Current Due Date</div><div class="value">{{ item.current_due_date|date:"d M Y, h:i A"|default:"-" }}</div></div></div>
+                            <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Requested Due Date</div><div class="value">{{ item.requested_due_date|date:"d M Y, h:i A" }}</div></div></div>
+                            <div class="col-12 mb-3"><div class="mini-stat"><div class="label">Reason</div><div class="value">{{ item.reason|linebreaksbr }}</div></div></div>
+                            {% if item.reviewed_at %}
+                            <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Reviewed By</div><div class="value">{{ item.reviewed_by.full_name|default:item.reviewed_by.username|default:"-" }}</div></div></div>
+                            <div class="col-md-6 mb-3"><div class="mini-stat"><div class="label">Reviewed At</div><div class="value">{{ item.reviewed_at|date:"d M Y, h:i A" }}</div></div></div>
+                            <div class="col-12"><div class="mini-stat"><div class="label">Review Note</div><div class="value">{{ item.review_note|default:"-"|linebreaksbr }}</div></div></div>
+                            {% endif %}
+                        </div>
+
+                        {% if can_manage and item.status == 'pending' %}
+                        <form method="post" action="{% url 'tasks:review_extension' item.id %}" class="mt-2">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Decision</label>
+                                    <select name="status" class="form-select">
+                                        <option value="approved">Approve</option>
+                                        <option value="rejected">Reject</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">Review Note</label>
+                                    <textarea name="review_note" rows="3" class="form-control" placeholder="Enter review note"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i>Submit Review
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="fd-empty-state">
+                    <i class="fas fa-calendar-xmark fa-2x mb-3 d-block"></i>
+                    <div>No extension requests recorded for this task.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-clock-rotate-left text-info"></i>Progress History</h3>
+            </div>
+            <div class="card-body">
+                {% if progress_updates %}
+                <div class="fd-surface-list">
+                    {% for update in progress_updates %}
+                    <div class="fd-surface-item">
+                        <div class="fd-surface-item__copy">
+                            <strong>{{ update.get_status_display }}</strong>
+                            <span>Updated by {{ update.updated_by.full_name|default:update.updated_by.username }} on {{ update.created_at|date:"d M Y, h:i A" }}</span>
+                            {% if update.note %}
+                            <span>{{ update.note }}</span>
+                            {% endif %}
+                        </div>
+                        <span class="badge status-badge status-{{ update.status }}">{{ update.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="fd-empty-state">
+                    <i class="fas fa-timeline fa-2x mb-3 d-block"></i>
+                    <div>No progress updates yet.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-stream text-secondary"></i>Activity Timeline</h3>
+            </div>
+            <div class="card-body">
+                {% if activity_timeline %}
+                <div class="fd-surface-list">
+                    {% for item in activity_timeline %}
+                    <div class="fd-surface-item">
+                        <div class="d-flex align-items-start gap-3 w-100">
+                            <span class="fd-user-chip" style="width:2.5rem;height:2.5rem;"><i class="fas {{ item.icon }}"></i></span>
+                            <div class="fd-surface-item__copy">
+                                <strong>{{ item.title }}</strong>
+                                <span>{{ item.actor }} • {{ item.timestamp|date:"d M Y, h:i A" }}</span>
+                                <span>{{ item.description }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="fd-empty-state">
+                    <i class="fas fa-list-check fa-2x mb-3 d-block"></i>
+                    <div>No recorded activity is available for this task yet.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <div class="col-xl-4 mb-4">
         <div class="card mb-4">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-circle-info mr-2 text-secondary"></i>Task Summary
-                </h3>
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-rectangle-list text-secondary"></i>Task Summary</h3>
             </div>
             <div class="card-body">
-                <div class="border rounded p-3 mb-3">
-                    <small class="text-muted d-block">Created At</small>
-                    <div class="font-weight-bold">{{ task.created_at|date:"d M Y, h:i A" }}</div>
-                </div>
-                <div class="border rounded p-3 mb-3">
-                    <small class="text-muted d-block">Last Updated</small>
-                    <div class="font-weight-bold">{{ task.updated_at|date:"d M Y, h:i A" }}</div>
-                </div>
-                <div class="border rounded p-3">
-                    <small class="text-muted d-block">Owner</small>
-                    <div class="font-weight-bold text-break">{{ task.created_by.email }}</div>
-                </div>
+                <div class="mini-stat mb-3"><div class="label">Created At</div><div class="value">{{ task.created_at|date:"d M Y, h:i A" }}</div></div>
+                <div class="mini-stat mb-3"><div class="label">Last Updated</div><div class="value">{{ task.updated_at|date:"d M Y, h:i A" }}</div></div>
+                <div class="mini-stat mb-3"><div class="label">Owner</div><div class="value email-break">{{ task.created_by.email }}</div></div>
+                <div class="mini-stat"><div class="label">Approval State</div><div class="value">{% if task.approved_at %}Approved on {{ task.approved_at|date:"d M Y, h:i A" }}{% elif task.rejected_at %}Rejected on {{ task.rejected_at|date:"d M Y, h:i A" }}{% else %}Awaiting workflow progression{% endif %}</div></div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header border-0">
-                <h3 class="card-title">
-                    <i class="fas fa-users mr-2 text-info"></i>Assigned Users
-                </h3>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-bolt text-primary"></i>Task Actions</h3>
             </div>
             <div class="card-body">
-                {% for assignment in assignments %}
-                <div class="border rounded p-3 mb-3">
-                    <small class="text-muted d-block">Assignee</small>
-                    <div class="font-weight-bold">
-                        {{ assignment.assigned_to.full_name|default:assignment.assigned_to.username }}
-                        {% if assignment.is_primary %}
-                            <span class="badge badge-primary ml-2">Primary</span>
+                {% if can_manage %}
+                <div class="fd-form-stack">
+                    {% if can_approve_task %}
+                    <div class="fd-inline-note">This task is waiting for approval. Use the controls below to approve it or reject it with a reason.</div>
+                    <a href="{% url 'tasks:approve' task.id %}?next={% url 'tasks:detail' task.id %}" class="btn btn-success fd-btn-block">
+                        <i class="fas fa-check"></i>Approve Task
+                    </a>
+                    <form method="post" action="{% url 'tasks:reject' task.id %}">
+                        {% csrf_token %}
+                        <label for="id_reason" class="form-label">Rejection Reason</label>
+                        {{ rejection_form.reason }}
+                        {% if rejection_form.reason.errors %}
+                        <div class="text-danger small mt-1">{{ rejection_form.reason.errors|striptags }}</div>
                         {% endif %}
+                        <button type="submit" class="btn btn-danger fd-btn-block mt-3">
+                            <i class="fas fa-xmark"></i>Reject Task
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'tasks:update_deadline' task.id %}">
+                        {% csrf_token %}
+                        <label for="{{ deadline_form.due_date.id_for_label }}" class="form-label">Update Deadline</label>
+                        {{ deadline_form.due_date }}
+                        {% if deadline_form.due_date.errors %}
+                        <div class="text-danger small mt-1">{{ deadline_form.due_date.errors|striptags }}</div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-warning fd-btn-block mt-3">
+                            <i class="fas fa-calendar-day"></i>Save Deadline
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'tasks:update_priority' task.id %}">
+                        {% csrf_token %}
+                        <label for="{{ priority_form.priority.id_for_label }}" class="form-label">Update Priority</label>
+                        {{ priority_form.priority }}
+                        {% if priority_form.priority.errors %}
+                        <div class="text-danger small mt-1">{{ priority_form.priority.errors|striptags }}</div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-danger fd-btn-block mt-3">
+                            <i class="fas fa-flag"></i>Save Priority
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'tasks:update_status' task.id %}">
+                        {% csrf_token %}
+                        <label for="{{ manager_status_form.status.id_for_label }}" class="form-label">Manage Status</label>
+                        {{ manager_status_form.status }}
+                        {% if manager_status_form.status.errors %}
+                        <div class="text-danger small mt-1">{{ manager_status_form.status.errors|striptags }}</div>
+                        {% endif %}
+
+                        <label for="{{ manager_status_form.note.id_for_label }}" class="form-label mt-3">Management Note</label>
+                        {{ manager_status_form.note }}
+                        {% if manager_status_form.note.errors %}
+                        <div class="text-danger small mt-1">{{ manager_status_form.note.errors|striptags }}</div>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary fd-btn-block mt-3">
+                            <i class="fas fa-arrows-rotate"></i>Update Status
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+                {% if is_assigned_employee %}
+                <div class="{% if can_manage %}border-top pt-4 mt-4{% endif %}">
+                    <div class="fd-form-stack">
+                        <div class="fd-inline-note">Employees can update progress and request deadline extensions directly from this workspace.</div>
+                        <form method="post" action="{% url 'tasks:update_status' task.id %}">
+                            {% csrf_token %}
+                            <label for="{{ employee_status_form.status.id_for_label }}" class="form-label">Update My Status</label>
+                            {{ employee_status_form.status }}
+                            {% if employee_status_form.status.errors %}
+                            <div class="text-danger small mt-1">{{ employee_status_form.status.errors|striptags }}</div>
+                            {% endif %}
+
+                            <label for="{{ employee_status_form.note.id_for_label }}" class="form-label mt-3">Progress Note</label>
+                            {{ employee_status_form.note }}
+                            {% if employee_status_form.note.errors %}
+                            <div class="text-danger small mt-1">{{ employee_status_form.note.errors|striptags }}</div>
+                            {% endif %}
+
+                            <button type="submit" class="btn btn-primary fd-btn-block mt-3">
+                                <i class="fas fa-save"></i>Update My Status
+                            </button>
+                        </form>
+
+                        <form method="post" action="{% url 'tasks:request_extension' task.id %}">
+                            {% csrf_token %}
+                            <label for="{{ extension_form.requested_due_date.id_for_label }}" class="form-label">Requested Due Date</label>
+                            {{ extension_form.requested_due_date }}
+                            {% if extension_form.requested_due_date.errors %}
+                            <div class="text-danger small mt-1">{{ extension_form.requested_due_date.errors|striptags }}</div>
+                            {% endif %}
+
+                            <label for="{{ extension_form.reason.id_for_label }}" class="form-label mt-3">Reason</label>
+                            {{ extension_form.reason }}
+                            {% if extension_form.reason.errors %}
+                            <div class="text-danger small mt-1">{{ extension_form.reason.errors|striptags }}</div>
+                            {% endif %}
+
+                            <button type="submit" class="btn btn-warning fd-btn-block mt-3">
+                                <i class="fas fa-paper-plane"></i>Request Extension
+                            </button>
+                        </form>
                     </div>
                 </div>
-                {% empty %}
-                <div class="text-muted">No assignments available.</div>
-                {% endfor %}
+                {% endif %}
+
+                {% if not can_manage and not is_assigned_employee %}
+                <div class="fd-empty-state">
+                    <i class="fas fa-lock fa-2x mb-3 d-block"></i>
+                    <div>No direct actions are available for your current role on this task.</div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

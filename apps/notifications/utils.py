@@ -47,3 +47,39 @@ def send_action_email(
         html_message=html_message,
     )
     return True
+
+
+def get_recipient_name(user):
+    return getattr(user, "full_name", None) or getattr(user, "username", None) or getattr(user, "email", "User")
+
+
+def send_task_action_email(
+    *,
+    subject,
+    recipient,
+    task,
+    heading,
+    intro,
+    action_summary,
+    detail_rows=None,
+    footer_note="Please check your dashboard for the latest task details.",
+):
+    detail_rows = detail_rows or []
+    context = {
+        "subject": subject,
+        "recipient_name": get_recipient_name(recipient),
+        "heading": heading,
+        "intro": intro,
+        "task": task,
+        "action_summary": action_summary,
+        "detail_rows": detail_rows,
+        "footer_note": footer_note,
+    }
+    return send_action_email(
+        subject=subject,
+        message=action_summary,
+        recipient_list=[recipient.email] if getattr(recipient, "email", None) else [],
+        html_template="emails/task_action_update_email.html",
+        text_template="emails/task_action_update_email.txt",
+        context=context,
+    )

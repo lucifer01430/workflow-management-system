@@ -102,7 +102,10 @@
                                 <td>{{ task.get_task_type_display }}</td>
                                 <td>{{ task.due_date|date:"d M Y, h:i A"|default:"-" }}</td>
                                 <td class="text-right">
-                                    <a href="{% url 'tasks:detail' task.id %}" class="btn btn-sm btn-primary"><i class="fas fa-eye mr-1"></i>View</a>
+                                    <a href="{% url 'tasks:detail' task.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas {% if request.user.role == 'employee' %}fa-eye{% else %}fa-sliders{% endif %} mr-1"></i>
+                                        {% if request.user.role == 'employee' %}View{% else %}Manage{% endif %}
+                                    </a>
                                 </td>
                             </tr>
                             {% empty %}

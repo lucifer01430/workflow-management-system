@@ -1,0 +1,15 @@
+{% extends "emails/base_email.html" %}
+
+{% block body %}
+<p style="margin:0 0 18px;font-size:15px;line-height:1.8;color:#526075;">{{ intro }}</p>
+<div style="padding:18px 20px;border:1px solid rgba(15,23,42,0.08);border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);">
+    <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#1d4ed8;font-weight:700;">Task update</div>
+    {% for row in detail_rows %}
+    <div style="{% if forloop.first %}margin-top:10px;{% endif %}color:#0f172a;line-height:1.8;">
+        <strong>{{ row.label }}:</strong> {{ row.value }}
+    </div>
+    {% endfor %}
+</div>
+<p style="margin:18px 0 0;font-size:14px;line-height:1.8;color:#0f172a;">{{ action_summary }}</p>
+<p style="margin:14px 0 0;font-size:14px;line-height:1.8;color:#526075;">{{ footer_note }}</p>
+{% endblock %}
