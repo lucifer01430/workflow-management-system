@@ -3,39 +3,45 @@
 {% block title %}Verify OTP | Workflow Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center py-lg-4">
-    <div class="col-lg-5 col-md-7">
-        <div class="text-center mb-4">
-            <h1 class="h3 fw-bold mb-2">Email verification</h1>
-            <p class="text-muted mb-0">Enter the one-time password sent to your registered email address.</p>
-        </div>
+<section class="fd-shell fd-auth-section">
+    <div class="fd-auth-layout">
+        <article class="fd-auth-aside">
+            <span class="fd-tag fd-tag--light">Verification</span>
+            <h1>Confirm your email to activate access.</h1>
+            <p>The OTP step keeps the onboarding flow secure while preserving the same visual language used throughout the platform.</p>
+            <ul class="fd-auth-points">
+                <li><i class="fas fa-envelope"></i><span>Verification email: {{ user_obj.email }}</span></li>
+                <li><i class="fas fa-key"></i><span>Provide the six-digit code exactly as received.</span></li>
+                <li><i class="fas fa-repeat"></i><span>You can resend a fresh OTP if the first one does not arrive.</span></li>
+            </ul>
+        </article>
 
-        <div class="card auth-card">
-            <div class="card-header">
-                <h2 class="h4 mb-1">Verify OTP</h2>
-                <p class="text-muted mb-0">Verification email: <strong>{{ user_obj.email }}</strong></p>
+        <div class="card fd-auth-card">
+            <div class="fd-auth-card__header">
+                <h2>Verify OTP</h2>
+                <p>Enter the one-time password sent to your registered email address.</p>
             </div>
             <div class="card-body">
                 {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
 
-                <form method="post" novalidate>
+                <form method="post" novalidate class="fd-form-stack">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="{{ form.otp_code.id_for_label }}" class="form-label fw-semibold">{{ form.otp_code.label }}</label>
+                    <div>
+                        <label for="{{ form.otp_code.id_for_label }}" class="form-label">{{ form.otp_code.label }}</label>
                         {{ form.otp_code }}
                         <div class="form-text">Provide the 6-digit OTP exactly as received in your inbox.</div>
                         {% if form.otp_code.errors %}
-                            <div class="text-danger small mt-1">
-                                {% for error in form.otp_code.errors %}
-                                    <div>{{ error }}</div>
-                                {% endfor %}
-                            </div>
+                        <div class="text-danger small mt-1">
+                            {% for error in form.otp_code.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
 
@@ -46,20 +52,16 @@
                     <small class="text-muted d-block mb-2">Didn&apos;t receive the OTP?</small>
                     <form method="post" action="{% url 'accounts:resend_otp' user_obj.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-link p-0 text-decoration-none">
-                            Resend OTP
-                        </button>
+                        <button type="submit" class="btn btn-link">Resend OTP</button>
                     </form>
                 </div>
 
-                <div class="text-center mt-4">
-                    <small class="text-muted">
-                        Verified already?
-                        <a href="{% url 'accounts:login' %}" class="text-decoration-none">Return to login</a>
-                    </small>
+                <div class="fd-auth-footer">
+                    Verified already?
+                    <a href="{% url 'accounts:login' %}" class="text-decoration-none">Return to login</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

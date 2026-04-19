@@ -1,11 +1,12 @@
 {% extends "emails/base_email.html" %}
 
 {% block body %}
-<p style="margin:0 0 18px;font-size:15px;line-height:1.7;">A new task is waiting in the approval workflow.</p>
-<div style="padding:18px;border:1px solid #dde3ea;border-radius:10px;background:#f8fafc;">
-    <div><strong>Task:</strong> {{ task.title }}</div>
-    <div><strong>Created By:</strong> {{ created_by_name }}</div>
-    <div><strong>Priority:</strong> {{ task.get_priority_display }}</div>
-    <div><strong>Department:</strong> {{ task.department|default:"-" }}</div>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.8;color:#526075;">A new task is waiting in the approval workflow.</p>
+<div style="padding:18px 20px;border:1px solid rgba(15,23,42,0.08);border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);">
+    <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#1d4ed8;font-weight:700;">Approval queue</div>
+    <div style="margin-top:10px;color:#0f172a;line-height:1.8;"><strong>Task:</strong> {{ task.title }}</div>
+    <div style="color:#0f172a;line-height:1.8;"><strong>Created By:</strong> {{ created_by_name }}</div>
+    <div style="color:#0f172a;line-height:1.8;"><strong>Priority:</strong> {{ task.get_priority_display }}</div>
+    <div style="color:#0f172a;line-height:1.8;"><strong>Department:</strong> {{ task.department|default:"-" }}</div>
 </div>
 {% endblock %}

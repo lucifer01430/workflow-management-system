@@ -2,6 +2,7 @@
 
 {% block title %}My Profile{% endblock %}
 {% block page_title %}My Profile{% endblock %}
+{% block page_subtitle %}A branded profile workspace for identity, department context, and reporting relationships.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -15,18 +16,33 @@
 {% endblock %}
 
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Profile workspace</span>
+        <h2>{{ request.user.full_name|default:request.user.username|default:"Profile" }}</h2>
+        <p>Review account identity, department details, and reporting contacts through the same premium UI system used across tasks and approvals.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ request.user.get_role_display }}</span>
+        <span>{{ request.user.department|default:"No department" }}</span>
+        <span>{{ request.user.registration_status|default:"Pending"|title }}</span>
+    </div>
+</div>
+
 <div class="row align-items-stretch">
     <div class="col-xl-4 col-lg-5 mb-4">
         <div class="card">
-            <div class="card-body text-center">
-                {% if request.user.profile_image %}
-                <img src="{{ request.user.profile_image.url }}" alt="Profile image" class="img-circle elevation-2 profile-avatar mb-3" width="120" height="120">
-                {% else %}
-                <img src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/img/user2-160x160.jpg" alt="Profile image" class="img-circle elevation-2 profile-avatar mb-3" width="120" height="120">
-                {% endif %}
+            <div class="card-body fd-profile-card">
+                <div class="fd-profile-card__avatar mx-auto">
+                    {% if request.user.profile_image %}
+                    <img src="{{ request.user.profile_image.url }}" alt="Profile image" class="profile-avatar">
+                    {% else %}
+                    <img src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/img/user2-160x160.jpg" alt="Profile image" class="profile-avatar">
+                    {% endif %}
+                </div>
 
-                <h3 class="h4 mb-1">{{ request.user.full_name|default:request.user.username|default:"-" }}</h3>
-                <p class="text-muted mb-4">{{ request.user.get_role_display }}</p>
+                <div class="fd-profile-card__name">{{ request.user.full_name|default:request.user.username|default:"-" }}</div>
+                <p class="fd-profile-card__meta mb-4">{{ request.user.get_role_display }}</p>
 
                 <div class="mini-stat mb-3">
                     <div class="label">Department</div>

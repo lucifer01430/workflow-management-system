@@ -2,6 +2,7 @@
 
 {% block title %}Task Detail{% endblock %}
 {% block page_title %}Task Detail{% endblock %}
+{% block page_subtitle %}Task context, ownership, notes, and management actions presented within one polished workflow surface.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -17,6 +18,19 @@
 {% endblock %}
 
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Task record</span>
+        <h2>{{ task.title }}</h2>
+        <p>Review the full task context, current state, linked notes, and assignee information from one structured detail view.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ task.get_status_display }}</span>
+        <span>{{ task.get_priority_display }}</span>
+        <span>{{ task.get_task_type_display }}</span>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-xl-8">
         <div class="card mb-4">

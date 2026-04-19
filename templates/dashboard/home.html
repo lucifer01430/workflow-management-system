@@ -2,6 +2,7 @@
 
 {% block title %}Dashboard Home | Workflow Management System{% endblock %}
 {% block page_title %}Dashboard Overview{% endblock %}
+{% block page_subtitle %}A branded operations hub for task visibility, approvals, notifications, and role-specific actions.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -159,7 +160,7 @@
 
 <div class="row">
     <div class="col-xl-8 mb-4">
-        <div class="card">
+        <div class="card fd-table-card">
             <div class="card-header border-0">
                 <h3 class="card-title"><i class="fas fa-list-check mr-2 text-info"></i>Assigned Tasks Summary</h3>
             </div>
@@ -280,7 +281,7 @@
 
 <div class="row">
     <div class="col-xl-8 mb-4">
-        <div class="card mb-4">
+        <div class="card mb-4 fd-table-card">
             <div class="card-header border-0">
                 <h3 class="card-title"><i class="fas fa-clipboard-list mr-2 text-primary"></i>Created Tasks Summary</h3>
             </div>
@@ -316,7 +317,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card fd-table-card">
             <div class="card-header border-0">
                 <h3 class="card-title"><i class="fas fa-building mr-2 text-info"></i>Department Tasks Summary</h3>
             </div>
@@ -465,7 +466,7 @@
 
 <div class="row">
     <div class="col-xl-8 mb-4">
-        <div class="card mb-4">
+        <div class="card mb-4 fd-table-card">
             <div class="card-header border-0">
                 <h3 class="card-title"><i class="fas fa-check-double mr-2 text-success"></i>Recently Approved / Rejected Tasks</h3>
             </div>
@@ -568,8 +569,8 @@
             <div class="card-body p-3">
                 {% if recent_notifications %}
                     {% for item in recent_notifications %}
-                    <div class="d-flex justify-content-between align-items-start py-2 {% if not forloop.last %}border-bottom{% endif %}">
-                        <div class="pr-3">
+                    <div class="fd-activity-row {% if not forloop.last %}mb-3{% endif %}">
+                        <div class="fd-activity-row__copy pr-3">
                             <div class="font-weight-bold">
                                 {% if not item.is_read %}
                                     <span class="badge badge-warning mr-2">New</span>

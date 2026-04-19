@@ -3,61 +3,65 @@
 {% block title %}Login | Workflow Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center py-lg-4">
-    <div class="col-lg-5 col-md-7">
-        <div class="text-center mb-4">
-            <h1 class="h3 fw-bold mb-2">Sign in to your workspace</h1>
-            <p class="text-muted mb-0">Access your internal workflow dashboard, tasks, approvals, and notifications.</p>
-        </div>
+<section class="fd-shell fd-auth-section">
+    <div class="fd-auth-layout">
+        <article class="fd-auth-aside">
+            <span class="fd-tag fd-tag--light">Secure access</span>
+            <h1>Sign in to your workflow workspace.</h1>
+            <p>Access tasks, approvals, notifications, and profile tools inside the same premium operational environment used across the product.</p>
+            <ul class="fd-auth-points">
+                <li><i class="fas fa-layer-group"></i><span>Unified dashboard styling with consistent hierarchy and spacing.</span></li>
+                <li><i class="fas fa-shield-alt"></i><span>Role-based access keeps the right actions visible for your account.</span></li>
+                <li><i class="fas fa-bell"></i><span>Notifications, approvals, and task activity stay connected in one workspace.</span></li>
+            </ul>
+        </article>
 
-        <div class="card auth-card">
-            <div class="card-header">
-                <h2 class="h4 mb-1">Login</h2>
-                <p class="text-muted mb-0">Use your registered email address and password.</p>
+        <div class="card fd-auth-card">
+            <div class="fd-auth-card__header">
+                <h2>Login</h2>
+                <p>Use your registered email address and password to continue.</p>
             </div>
             <div class="card-body">
                 {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
 
-                <form method="post" novalidate>
+                <form method="post" novalidate class="fd-form-stack">
                     {% csrf_token %}
                     {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <div class="form-text">{{ field.help_text }}</div>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in field.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in field.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
                         </div>
+                        {% endif %}
+                    </div>
                     {% endfor %}
 
-                    <div class="d-flex justify-content-end mb-3">
-                        <a href="{% url 'accounts:password_reset' %}" class="small text-decoration-none">Forgot Password?</a>
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'accounts:password_reset' %}" class="btn btn-link">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="btn btn-brand w-100">Login</button>
                 </form>
 
-                <div class="text-center mt-4">
-                    <small class="text-muted">
-                        Need an account?
-                        <a href="{% url 'accounts:register' %}" class="text-decoration-none">Register here</a>
-                    </small>
+                <div class="fd-auth-footer">
+                    Need an account?
+                    <a href="{% url 'accounts:register' %}" class="text-decoration-none">Register here</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

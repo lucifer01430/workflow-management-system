@@ -18,17 +18,17 @@
                 <div class="dropdown-divider m-0"></div>
                 <a
                     href="{% if notification.task %}{% url 'tasks:detail' notification.task.id %}{% else %}{% url 'notifications:list' %}{% endif %}"
-                    class="dropdown-item py-3 bg-light"
+                    class="dropdown-item notification-item unread"
                 >
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="pr-2">
-                            <div class="font-weight-bold text-dark mb-1">
+                            <span class="title">
                                 {{ notification.title|truncatechars:35 }}
-                            </div>
-                            <div class="text-muted small mb-1">
+                            </span>
+                            <span class="message">
                                 {{ notification.message|truncatechars:60 }}
-                            </div>
-                            <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                            </span>
+                            <span class="meta">{{ notification.created_at|timesince }} ago</span>
                         </div>
                         <span class="badge badge-warning mt-1">New</span>
                     </div>
@@ -36,7 +36,7 @@
             {% endfor %}
         {% else %}
             <div class="dropdown-divider m-0"></div>
-            <div class="dropdown-item text-muted py-3 text-center">
+            <div class="dropdown-item notification-item text-center">
                 No recent notifications.
             </div>
         {% endif %}

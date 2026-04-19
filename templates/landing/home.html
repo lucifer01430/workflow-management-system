@@ -1,17 +1,552 @@
 {% extends "base/base.html" %}
 
-{% block title %}Home | Workflow Management System{% endblock %}
+{% block title %}Workflow Management System | Internal Workflow Platform{% endblock %}
+{% block body_class %}fd-body{% endblock %}
+{% block main_class %}fd-page-shell{% endblock %}
+
+{% block navbar %}
+<nav class="fd-nav" id="fd-nav">
+  <div class="fd-shell fd-nav__inner">
+    <a href="{% url 'core:home' %}" class="fd-nav__brand" aria-label="Workflow Management System home">
+      <span class="fd-nav__logo"><i class="fas fa-layer-group"></i></span>
+      <span class="fd-nav__brand-text">Workflow Management System</span>
+    </a>
+
+    <button
+      class="fd-nav__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="fd-nav-menu"
+      aria-label="Toggle navigation"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="fd-nav__menu" id="fd-nav-menu">
+      <ul class="fd-nav__links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#roles">Roles</a></li>
+        <li><a href="#task-types">Task Types</a></li>
+        <li><a href="#workflow">How It Works</a></li>
+      </ul>
+
+      <div class="fd-nav__actions">
+        <a href="{% url 'accounts:login' %}" class="fd-btn fd-btn--ghost">Login</a>
+        <a href="{% url 'accounts:register' %}" class="fd-btn fd-btn--primary">Get Started</a>
+      </div>
+    </div>
+  </div>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-light rounded-3">
-    <div class="container py-5">
-        <h1 class="display-5 fw-bold">Workflow Management System</h1>
-        <p class="col-md-8 fs-5">
-            A role-based internal workflow and task management software for structured task assignment,
-            approvals, employee coordination, and accountability across departments.
-        </p>
-        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg me-2">Get Started</a>
-        <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-lg">Login</a>
+<section class="fd-hero">
+  <div class="fd-hero__glow fd-hero__glow--one"></div>
+  <div class="fd-hero__glow fd-hero__glow--two"></div>
+  <div class="fd-hero__gridline"></div>
+
+  <div class="fd-shell fd-hero__grid">
+    <div class="fd-hero__copy anim-up">
+      <span class="fd-kicker">
+        <span class="fd-kicker__dot"></span>
+        Internal workflow control for structured teams
+      </span>
+
+      <h1 class="fd-hero__title">
+        Workflow Management System brings clarity to task execution, approvals, and team-wide accountability.
+      </h1>
+
+      <p class="fd-hero__sub">
+        Build repeatable workflows, route approvals with confidence, and keep every department aligned with a clean operational view from request to completion.
+      </p>
+
+      <div class="fd-hero__actions">
+        <a href="{% url 'accounts:register' %}" class="fd-btn fd-btn--primary fd-btn--large">
+          Create account
+        </a>
+        <a href="#workflow" class="fd-btn fd-btn--secondary fd-btn--large">
+          See workflow
+        </a>
+      </div>
+
+      <div class="fd-proof">
+        <div class="fd-proof__item">
+          <i class="fas fa-shield-alt"></i>
+          Role-based access
+        </div>
+        <div class="fd-proof__item">
+          <i class="fas fa-check-double"></i>
+          Manager approvals
+        </div>
+        <div class="fd-proof__item">
+          <i class="fas fa-clock-rotate-left"></i>
+          Full audit history
+        </div>
+      </div>
     </div>
-</div>
+
+    <div class="fd-hero__visual anim-up">
+      <div class="fd-floating-card fd-floating-card--left">
+        <span class="fd-floating-card__eyebrow">Delivery rate</span>
+        <strong>92%</strong>
+        <span>Tasks closed on time this week</span>
+      </div>
+
+      <div class="fd-product">
+        <div class="fd-product__bar">
+          <div class="fd-product__dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="fd-product__url">workflow-management.internal/dashboard</div>
+        </div>
+
+        <div class="fd-product__body">
+          <div class="fd-product__header">
+            <div>
+              <span class="fd-product__eyebrow">Operations overview</span>
+              <h2>Good morning, Sarah</h2>
+              <p>Finance department, eight live workflows</p>
+            </div>
+            <div class="fd-product__avatar">SG</div>
+          </div>
+
+          <div class="fd-product__stats">
+            <article class="fd-mini-card">
+              <span>In progress</span>
+              <strong>14</strong>
+              <small>Across three departments</small>
+            </article>
+            <article class="fd-mini-card">
+              <span>Pending approval</span>
+              <strong>4</strong>
+              <small>Waiting for GM review</small>
+            </article>
+            <article class="fd-mini-card">
+              <span>Completed</span>
+              <strong>91</strong>
+              <small>Closed in the current cycle</small>
+            </article>
+          </div>
+
+          <div class="fd-stream">
+            <div class="fd-stream__header">
+              <span>Live task activity</span>
+              <a href="{% url 'accounts:login' %}">Open dashboard</a>
+            </div>
+
+            <div class="fd-stream__row">
+              <div class="fd-stream__dot fd-stream__dot--blue"></div>
+              <div class="fd-stream__content">
+                <strong>Q4 budget review and reconciliation</strong>
+                <span>Finance, due tomorrow, high priority</span>
+              </div>
+              <span class="fd-status-pill fd-status-pill--info">In progress</span>
+            </div>
+
+            <div class="fd-stream__row">
+              <div class="fd-stream__dot fd-stream__dot--amber"></div>
+              <div class="fd-stream__content">
+                <strong>Vendor onboarding documentation</strong>
+                <span>Operations, awaiting GM approval</span>
+              </div>
+              <span class="fd-status-pill fd-status-pill--warning">Pending GM</span>
+            </div>
+
+            <div class="fd-stream__row">
+              <div class="fd-stream__dot fd-stream__dot--green"></div>
+              <div class="fd-stream__content">
+                <strong>Monthly compliance audit</strong>
+                <span>HR, completed two hours ago</span>
+              </div>
+              <span class="fd-status-pill fd-status-pill--success">Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fd-floating-card fd-floating-card--right">
+        <span class="fd-floating-card__eyebrow">Approval queue</span>
+        <strong>4</strong>
+        <span>Requests awaiting final review</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="fd-section fd-section--metrics">
+  <div class="fd-shell">
+    <div class="fd-section-heading fd-section-heading--split">
+      <div>
+        <span class="fd-tag">Operational visibility</span>
+        <h2>Clean, dynamic metrics cards that scale across every screen.</h2>
+      </div>
+      <p>
+        The homepage now uses evenly distributed cards with animated counters, hover depth, and consistent spacing so the platform feels like a polished SaaS product instead of a static demo.
+      </p>
+    </div>
+
+    <div class="fd-metrics__grid">
+      <article class="fd-metric-card anim-up">
+        <div class="fd-metric-card__top">
+          <span class="fd-metric-card__label">User roles</span>
+          <span class="fd-metric-card__icon"><i class="fas fa-user-shield"></i></span>
+        </div>
+        <strong class="fd-metric-card__value" data-count="4">4</strong>
+        <p>Super Admin, General Manager, HOD, and Employee permission layers.</p>
+      </article>
+
+      <article class="fd-metric-card anim-up">
+        <div class="fd-metric-card__top">
+          <span class="fd-metric-card__label">Workflow states</span>
+          <span class="fd-metric-card__icon"><i class="fas fa-diagram-project"></i></span>
+        </div>
+        <strong class="fd-metric-card__value" data-count="14">14</strong>
+        <p>End-to-end task status coverage from request creation to final closure.</p>
+      </article>
+
+      <article class="fd-metric-card anim-up">
+        <div class="fd-metric-card__top">
+          <span class="fd-metric-card__label">Core modules</span>
+          <span class="fd-metric-card__icon"><i class="fas fa-layer-group"></i></span>
+        </div>
+        <strong class="fd-metric-card__value" data-count="12">12</strong>
+        <p>Authentication, approvals, reporting, notifications, exports, and more.</p>
+      </article>
+
+      <article class="fd-metric-card anim-up">
+        <div class="fd-metric-card__top">
+          <span class="fd-metric-card__label">Audit visibility</span>
+          <span class="fd-metric-card__icon"><i class="fas fa-file-shield"></i></span>
+        </div>
+        <strong class="fd-metric-card__value" data-count="100" data-suffix="%">100%</strong>
+        <p>Every assignment, review, comment, and deadline update is timestamped.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="fd-section" id="features">
+  <div class="fd-shell">
+    <div class="fd-section-heading fd-section-heading--split">
+      <div>
+        <span class="fd-tag">Platform features</span>
+        <h2>Designed for structured delivery, not operational chaos.</h2>
+      </div>
+      <p>
+        The interface emphasizes hierarchy, readability, and controlled motion while keeping the markup reusable and friendly to Django templates.
+      </p>
+    </div>
+
+    <div class="fd-feature-grid">
+      <article class="fd-feature-card anim-up">
+        <span class="fd-feature-card__icon"><i class="fas fa-shield-alt"></i></span>
+        <h3>Role-based access control</h3>
+        <p>Permissions stay scoped by role so only the right people can approve, assign, or review work.</p>
+      </article>
+
+      <article class="fd-feature-card anim-up">
+        <span class="fd-feature-card__icon"><i class="fas fa-code-branch"></i></span>
+        <h3>Two task workflows</h3>
+        <p>Use quick tasks for direct execution and approval tasks for work that needs formal review.</p>
+      </article>
+
+      <article class="fd-feature-card anim-up">
+        <span class="fd-feature-card__icon"><i class="fas fa-bell"></i></span>
+        <h3>Smart notifications</h3>
+        <p>Keep managers and employees informed with timely updates for assignments, approvals, and escalations.</p>
+      </article>
+
+      <article class="fd-feature-card anim-up">
+        <span class="fd-feature-card__icon"><i class="fas fa-clock-rotate-left"></i></span>
+        <h3>Complete audit trail</h3>
+        <p>Track each action with timestamps so accountability is built into the workflow itself.</p>
+      </article>
+
+      <article class="fd-feature-card anim-up">
+        <span class="fd-feature-card__icon"><i class="fas fa-chart-column"></i></span>
+        <h3>Report-ready visibility</h3>
+        <p>Review overdue work, department load, and employee performance without searching across screens.</p>
+      </article>
+
+      <article class="fd-feature-card anim-up">
+        <span class="fd-feature-card__icon"><i class="fas fa-user-group"></i></span>
+        <h3>Multi-assignee support</h3>
+        <p>Assign one task to several employees while keeping individual progress and shared context visible.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="fd-section fd-section--soft" id="roles">
+  <div class="fd-shell">
+    <div class="fd-section-heading fd-section-heading--center">
+      <span class="fd-tag">User roles</span>
+      <h2>One system, four responsibility layers.</h2>
+      <p>Each role is distinct, readable, and easy to understand at a glance.</p>
+    </div>
+
+    <div class="fd-role-grid">
+      <article class="fd-role-card anim-up">
+        <span class="fd-role-card__index">01</span>
+        <span class="fd-role-card__icon"><i class="fas fa-crown"></i></span>
+        <h3>Super Admin</h3>
+        <p>Controls users, structure, system settings, and full platform visibility.</p>
+      </article>
+
+      <article class="fd-role-card anim-up">
+        <span class="fd-role-card__index">02</span>
+        <span class="fd-role-card__icon"><i class="fas fa-user-tie"></i></span>
+        <h3>General Manager</h3>
+        <p>Approves critical work, monitors cross-team execution, and manages priority.</p>
+      </article>
+
+      <article class="fd-role-card anim-up">
+        <span class="fd-role-card__index">03</span>
+        <span class="fd-role-card__icon"><i class="fas fa-sitemap"></i></span>
+        <h3>HOD</h3>
+        <p>Creates tasks, assigns work, reviews progress, and closes completed items.</p>
+      </article>
+
+      <article class="fd-role-card anim-up">
+        <span class="fd-role-card__index">04</span>
+        <span class="fd-role-card__icon"><i class="fas fa-user"></i></span>
+        <h3>Employee</h3>
+        <p>Executes assigned tasks, updates status, and submits work or extension requests.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="fd-section" id="task-types">
+  <div class="fd-shell">
+    <div class="fd-section-heading fd-section-heading--split">
+      <div>
+        <span class="fd-tag">Task types</span>
+        <h2>Two workflow models for fast work and controlled approvals.</h2>
+      </div>
+      <p>
+        Both cards use the same structural system, which keeps the template maintainable while clearly differentiating urgency from governance.
+      </p>
+    </div>
+
+    <div class="fd-split-panels">
+      <article class="fd-workflow-card fd-workflow-card--dark anim-up">
+        <span class="fd-workflow-card__tag">Quick task</span>
+        <h3>Direct execution for everyday work.</h3>
+        <p>Best for short, routine assignments that can move immediately from creation to ownership.</p>
+        <ul class="fd-workflow-card__list">
+          <li>HOD creates task with assignee, deadline, and priority.</li>
+          <li>Employee receives the task instantly.</li>
+          <li>Status updates remain visible throughout execution.</li>
+          <li>HOD reviews and closes the completed task.</li>
+        </ul>
+      </article>
+
+      <article class="fd-workflow-card anim-up">
+        <span class="fd-workflow-card__tag">Approval task</span>
+        <h3>Executive sign-off for high-impact work.</h3>
+        <p>Ideal for sensitive or cross-functional requests that need structured review before execution starts.</p>
+        <ul class="fd-workflow-card__list">
+          <li>HOD submits a full task request for approval.</li>
+          <li>General Manager reviews, comments, and decides.</li>
+          <li>Approved work becomes active for the assignee.</li>
+          <li>The full decision trail stays available for audit.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="fd-section fd-section--soft" id="workflow">
+  <div class="fd-shell">
+    <div class="fd-section-heading fd-section-heading--center">
+      <span class="fd-tag">How it works</span>
+      <h2>The approval flow is clear from request to closure.</h2>
+      <p>Every step is visible, timestamped, and easy to follow.</p>
+    </div>
+
+    <div class="fd-timeline">
+      <article class="fd-timeline__item anim-up">
+        <span class="fd-timeline__marker"><i class="fas fa-plus"></i></span>
+        <div class="fd-timeline__card">
+          <span class="fd-timeline__role">HOD</span>
+          <h3>Task request created</h3>
+          <p>The request captures title, detail, assignee, priority, and deadline before it enters review.</p>
+        </div>
+      </article>
+
+      <article class="fd-timeline__item anim-up">
+        <span class="fd-timeline__marker"><i class="fas fa-paper-plane"></i></span>
+        <div class="fd-timeline__card">
+          <span class="fd-timeline__role">System</span>
+          <h3>Approval queue triggered</h3>
+          <p>The request moves into a pending state and the relevant approver is notified immediately.</p>
+        </div>
+      </article>
+
+      <article class="fd-timeline__item anim-up">
+        <span class="fd-timeline__marker"><i class="fas fa-stamp"></i></span>
+        <div class="fd-timeline__card">
+          <span class="fd-timeline__role">General Manager</span>
+          <h3>Decision with remarks</h3>
+          <p>The approver accepts or rejects the request and can leave comments to preserve decision context.</p>
+        </div>
+      </article>
+
+      <article class="fd-timeline__item anim-up">
+        <span class="fd-timeline__marker"><i class="fas fa-flag-checkered"></i></span>
+        <div class="fd-timeline__card">
+          <span class="fd-timeline__role">Employee and HOD</span>
+          <h3>Execution and closure</h3>
+          <p>Once approved, the assignee works the task, submits completion, and the HOD closes it with full history intact.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="fd-section">
+  <div class="fd-shell">
+    <div class="fd-cta">
+      <div>
+        <span class="fd-tag fd-tag--light">Get started</span>
+        <h2>Launch Workflow Management System with a homepage that feels production ready.</h2>
+        <p>
+          The layout is now centered correctly, the branding is consistent, the cards are responsive, and the visual system is tuned for a modern SaaS experience.
+        </p>
+      </div>
+
+      <div class="fd-cta__actions">
+        <a href="{% url 'accounts:register' %}" class="fd-btn fd-btn--primary fd-btn--large">Register now</a>
+        <a href="{% url 'accounts:login' %}" class="fd-btn fd-btn--ghost-light fd-btn--large">Login</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<footer class="fd-footer">
+  <div class="fd-shell fd-footer__inner">
+    <div class="fd-footer__brand-block">
+      <a href="{% url 'core:home' %}" class="fd-footer__brand">Workflow Management System</a>
+      <p>Structured task execution for teams that need visibility, control, and accountability.</p>
+    </div>
+
+    <div class="fd-footer__links">
+      <a href="#features">Features</a>
+      <a href="#roles">Roles</a>
+      <a href="#task-types">Task Types</a>
+      <a href="#workflow">How It Works</a>
+    </div>
+
+    <div class="fd-footer__meta">
+      <span>&copy; {% now "Y" %} Workflow Management System</span>
+      <span>Designed and developed by <a href="https://lucifer01430.github.io/Portfolio" target="_blank" rel="noopener noreferrer">Harsh</a></span>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const nav = document.getElementById("fd-nav");
+    const navToggle = document.querySelector(".fd-nav__toggle");
+    const navMenu = document.getElementById("fd-nav-menu");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function syncNavState() {
+      if (nav) {
+        nav.classList.toggle("scrolled", window.scrollY > 12);
+      }
+    }
+
+    syncNavState();
+    window.addEventListener("scroll", syncNavState, { passive: true });
+
+    if (navToggle && navMenu) {
+      navToggle.addEventListener("click", function () {
+        const isOpen = navMenu.classList.toggle("is-open");
+        navToggle.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      navMenu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          navMenu.classList.remove("is-open");
+          navToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
+
+    const revealItems = document.querySelectorAll(".anim-up");
+    if (prefersReducedMotion) {
+      revealItems.forEach(function (item) {
+        item.classList.add("visible");
+      });
+    } else {
+      const revealObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry, index) {
+          if (!entry.isIntersecting) {
+            return;
+          }
+          setTimeout(function () {
+            entry.target.classList.add("visible");
+          }, index * 70);
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.18 });
+
+      revealItems.forEach(function (item) {
+        revealObserver.observe(item);
+      });
+    }
+
+    const counters = document.querySelectorAll("[data-count]");
+    const formatValue = function (value, suffix) {
+      return value.toLocaleString("en-US") + suffix;
+    };
+
+    if (prefersReducedMotion) {
+      counters.forEach(function (counter) {
+        counter.textContent = formatValue(Number(counter.dataset.count || 0), counter.dataset.suffix || "");
+      });
+      return;
+    }
+
+    const counterObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        const counter = entry.target;
+        const target = Number(counter.dataset.count || 0);
+        const suffix = counter.dataset.suffix || "";
+        const duration = 1200;
+        const startTime = performance.now();
+
+        const tick = function (now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const value = Math.round(progress * target);
+          counter.textContent = formatValue(value, suffix);
+          if (progress < 1) {
+            window.requestAnimationFrame(tick);
+          }
+        };
+
+        window.requestAnimationFrame(tick);
+        observer.unobserve(counter);
+      });
+    }, { threshold: 0.55 });
+
+    counters.forEach(function (counter) {
+      counterObserver.observe(counter);
+    });
+  });
+</script>
 {% endblock %}

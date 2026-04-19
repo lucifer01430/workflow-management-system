@@ -3,50 +3,56 @@
 {% block title %}Register | Workflow Management System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-lg-4">
-    <div class="col-xl-9 col-lg-10">
-        <div class="text-center mb-4">
-            <h1 class="h3 fw-bold mb-2">Create your employee account</h1>
-            <p class="text-muted mb-0">Register once to begin the approval and onboarding workflow for the system.</p>
-        </div>
+<section class="fd-shell fd-auth-section">
+    <div class="fd-auth-layout fd-auth-layout--wide">
+        <article class="fd-auth-aside">
+            <span class="fd-tag fd-tag--light">Employee onboarding</span>
+            <h1>Create your account inside one consistent system.</h1>
+            <p>Registration is the first step into the same branded workflow platform used for approvals, task execution, and profile management.</p>
+            <ul class="fd-auth-points">
+                <li><i class="fas fa-user-check"></i><span>Complete your employee details once and keep your workspace profile aligned.</span></li>
+                <li><i class="fas fa-envelope-open-text"></i><span>Email verification uses OTP so the onboarding flow stays controlled and secure.</span></li>
+                <li><i class="fas fa-diagram-project"></i><span>Your account enters the broader workflow system without any visual theme shift.</span></li>
+            </ul>
+        </article>
 
-        <div class="card auth-card">
-            <div class="card-header">
-                <h2 class="h4 mb-1">Registration Form</h2>
-                <p class="text-muted mb-0">Complete all required employee details. Your email will be verified through OTP.</p>
+        <div class="card fd-auth-card">
+            <div class="fd-auth-card__header">
+                <h2>Registration Form</h2>
+                <p>Complete the required employee details. Your email will be verified through OTP.</p>
             </div>
             <div class="card-body">
                 {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
 
                 <form method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
-                    <div class="row g-3">
+                    <div class="fd-form-grid">
                         {% for field in form %}
-                            <div class="{% if field.name == 'profile_image' %}col-12{% else %}col-md-6{% endif %}">
-                                <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <div class="form-text">{{ field.help_text }}</div>
-                                {% endif %}
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in field.errors %}
-                                            <div>{{ error }}</div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
+                        <div class="{% if field.name == 'profile_image' %}fd-form-grid__full{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in field.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
                             </div>
+                            {% endif %}
+                        </div>
                         {% endfor %}
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4 pt-2 border-top">
-                        <p class="text-muted mb-0">Already registered? Continue to the sign in page.</p>
+                    <div class="fd-form-actions mt-4 pt-3 border-top">
+                        <p class="text-muted mb-0 mr-auto">Already registered? Continue to the sign in page.</p>
                         <div class="d-flex gap-2">
                             <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary">Login</a>
                             <button type="submit" class="btn btn-brand">Register &amp; Send OTP</button>
@@ -56,5 +62,5 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

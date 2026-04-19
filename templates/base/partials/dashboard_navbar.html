@@ -13,17 +13,27 @@
         <li class="nav-item dropdown">
             <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
                 {% if request.user.profile_image %}
+                <span class="fd-user-menu">
                     <img
                         src="{{ request.user.profile_image.url }}"
                         alt="{{ request.user.full_name|default:request.user.username }}"
-                        class="rounded-circle mr-2"
-                        style="width: 32px; height: 32px; object-fit: cover;"
+                        class="rounded-circle fd-user-avatar"
                     >
-                {% else %}
-                    <span class="mr-2 d-none d-sm-inline">
-                        {{ request.user.full_name|default:request.user.username|default:"User" }}
+                    <span class="fd-user-meta d-none d-sm-grid">
+                        <strong>{{ request.user.full_name|default:request.user.username|default:"User" }}</strong>
+                        <span>{{ request.user.get_role_display|default:"Workspace user" }}</span>
                     </span>
-                    <i class="fas fa-user-circle"></i>
+                </span>
+                {% else %}
+                <span class="fd-user-menu">
+                    <span class="fd-user-chip">
+                        {{ request.user.full_name|default:request.user.username|default:"U"|slice:":1"|upper }}
+                    </span>
+                    <span class="fd-user-meta d-none d-sm-grid">
+                        <strong>{{ request.user.full_name|default:request.user.username|default:"User" }}</strong>
+                        <span>{{ request.user.get_role_display|default:"Workspace user" }}</span>
+                    </span>
+                </span>
                 {% endif %}
             </a>
 
@@ -38,10 +48,10 @@
                 <div class="dropdown-divider"></div>
 
                 <a href="{% url 'accounts:profile' %}" class="dropdown-item">
-                    <i class="fas fa-id-badge mr-2"></i> My Profile
+                    <i class="fas fa-id-badge mr-2 text-primary"></i> My Profile
                 </a>
                 <a href="{% url 'notifications:list' %}" class="dropdown-item">
-                    <i class="fas fa-bell mr-2"></i> Notifications
+                    <i class="fas fa-bell mr-2 text-warning"></i> Notifications
                 </a>
                 <a href="{% url 'accounts:logout' %}" class="dropdown-item text-danger">
                     <i class="fas fa-sign-out-alt mr-2"></i> Logout

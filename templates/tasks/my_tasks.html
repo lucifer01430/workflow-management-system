@@ -2,6 +2,7 @@
 
 {% block title %}My Tasks{% endblock %}
 {% block page_title %}Task Workspace{% endblock %}
+{% block page_subtitle %}A unified task view with role-aware visibility, consistent filters, and polished operational tables.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -15,9 +16,32 @@
 {% endblock %}
 
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Task operations</span>
+        <h2>
+            {% if request.user.role == 'employee' %}
+            My assigned tasks
+            {% elif request.user.role == 'hod' %}
+            Department task command view
+            {% else %}
+            All task activity
+            {% endif %}
+        </h2>
+        <p>
+            Review task scope, track workflow state, and move from overview to detail without leaving the shared design system.
+        </p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ request.user.get_role_display }}</span>
+        <span>{{ request.user.department|default:"No department" }}</span>
+        <span>{{ tasks|length }} visible task{{ tasks|length|pluralize }}</span>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card fd-table-card">
             <div class="card-header border-0">
                 <div class="d-flex justify-content-between align-items-center flex-wrap">
                     <h3 class="card-title mb-2 mb-md-0">
@@ -31,8 +55,8 @@
                         {% endif %}
                     </h3>
                     <div class="d-flex flex-wrap gap-2">
-                        <input type="text" class="form-control form-control-sm" style="max-width: 220px;" placeholder="Search tasks (UI placeholder)">
-                        <select class="form-control form-control-sm" style="max-width: 180px;">
+                        <input type="text" class="form-control form-control-sm fd-toolbar-search" placeholder="Search tasks (UI placeholder)">
+                        <select class="form-control form-control-sm fd-toolbar-select">
                             <option>All statuses</option>
                             <option>Pending</option>
                             <option>In Progress</option>

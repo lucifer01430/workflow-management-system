@@ -2,6 +2,7 @@
 
 {% block title %}Create Task{% endblock %}
 {% block page_title %}Create Task{% endblock %}
+{% block page_subtitle %}Create new workflow items inside the same visual system used across dashboard summaries, forms, and approvals.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -16,6 +17,19 @@
 {% endblock %}
 
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Task creation</span>
+        <h2>Launch a new workflow item.</h2>
+        <p>Capture the operational context, assign ownership, and choose the right workflow type without leaving the unified product language.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>Quick tasks</span>
+        <span>Approval tasks</span>
+        <span>Reusable form styling</span>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-8">
         <div class="card card-outline card-primary shadow-sm">
@@ -82,7 +96,7 @@
             </div>
 
             <div class="card-body">
-                <div class="info-box bg-light">
+                <div class="info-box bg-light mb-3">
                     <div class="info-box-content">
                         <span class="info-box-text font-weight-semibold text-dark">Quick Task</span>
                         <span class="text-muted small">
@@ -91,7 +105,7 @@
                     </div>
                 </div>
 
-                <div class="info-box bg-light">
+                <div class="info-box bg-light mb-3">
                     <div class="info-box-content">
                         <span class="info-box-text font-weight-semibold text-dark">Approval Task</span>
                         <span class="text-muted small">

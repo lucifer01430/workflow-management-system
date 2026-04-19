@@ -2,6 +2,7 @@
 
 {% block title %}Edit Task{% endblock %}
 {% block page_title %}Edit Task{% endblock %}
+{% block page_subtitle %}Update task configuration with the same form hierarchy, spacing, and supporting guidance used elsewhere in the platform.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -15,6 +16,19 @@
 {% endblock %}
 
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Task maintenance</span>
+        <h2>Edit workflow details safely.</h2>
+        <p>Adjust task configuration, assignees, notes, and workflow metadata while preserving the existing backend process.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ task.get_status_display }}</span>
+        <span>{{ task.get_priority_display }}</span>
+        <span>{{ task.department|default:"No department" }}</span>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-xl-8">
         <div class="card">

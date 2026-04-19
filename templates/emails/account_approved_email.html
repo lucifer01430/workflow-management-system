@@ -1,10 +1,11 @@
 {% extends "emails/base_email.html" %}
 
 {% block body %}
-<p style="margin:0 0 18px;font-size:15px;line-height:1.7;">Your account has been approved and is ready to use.</p>
-<div style="padding:18px;border:1px solid #dde3ea;border-radius:10px;background:#f8fafc;">
-    <div><strong>Email:</strong> {{ email }}</div>
-    <div><strong>Role:</strong> {{ role }}</div>
-    <div><strong>Department:</strong> {{ department|default:"-" }}</div>
+<p style="margin:0 0 18px;font-size:15px;line-height:1.8;color:#526075;">Your account has been approved and is ready to use.</p>
+<div style="padding:18px 20px;border:1px solid rgba(15,23,42,0.08);border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);">
+    <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#15803d;font-weight:700;">Account approved</div>
+    <div style="margin-top:10px;color:#0f172a;line-height:1.8;"><strong>Email:</strong> {{ email }}</div>
+    <div style="color:#0f172a;line-height:1.8;"><strong>Role:</strong> {{ role }}</div>
+    <div style="color:#0f172a;line-height:1.8;"><strong>Department:</strong> {{ department|default:"-" }}</div>
 </div>
 {% endblock %}

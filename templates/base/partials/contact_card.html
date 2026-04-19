@@ -1,143 +1,62 @@
-<div class="card border shadow-sm h-100 professional-card">
-
-    <!-- Header -->
-    <div class="card-header bg-white border-bottom d-flex align-items-center">
-        <i class="fas fa-user-tie text-primary mr-2"></i>
-        <h6 class="mb-0 font-weight-bold text-dark">
+<div class="card fd-contact-card">
+    <div class="card-header">
+        <h6 class="card-title">
+            <i class="fas fa-user-tie text-primary"></i>
             {{ card_title }}
         </h6>
     </div>
 
-    <!-- Body -->
-    <div class="card-body px-4 py-4">
-
+    <div class="card-body fd-contact-card__body">
         {% if contact %}
+        <div class="fd-contact-card__person">
+            <div class="fd-contact-avatar">
+                {% if contact.profile_image %}
+                <img src="{{ contact.profile_image.url }}" alt="{{ contact.full_name|default:contact.username|default:'Contact' }}">
+                {% else %}
+                <i class="fas fa-user"></i>
+                {% endif %}
+            </div>
 
-        <!-- Top Section -->
-        <div class="d-flex align-items-center mb-4">
-            
-            {% if contact.profile_image %}
-                <img src="{{ contact.profile_image.url }}"
-                     class="rounded-circle border"
-                     width="70" height="70"
-                     style="object-fit: cover;">
-            {% else %}
-                <div class="rounded-circle border d-flex align-items-center justify-content-center"
-                     style="width:70px;height:70px;">
-                    <i class="fas fa-user text-muted"></i>
-                </div>
-            {% endif %}
-
-            <div class="ml-3">
-                <div class="font-weight-bold text-dark" style="font-size: 16px;">
-                    {{ contact.full_name|default:contact.username|default:"Not available" }}
-                </div>
-                <div class="text-muted" style="font-size: 13px;">
-                    {{ contact.designation|default:"Not assigned" }}
-                </div>
+            <div>
+                <strong>{{ contact.full_name|default:contact.username|default:"Not available" }}</strong>
+                <span>{{ contact.designation|default:"Not assigned" }}</span>
             </div>
         </div>
 
-        <!-- Info Table Style -->
-        <div class="info-section">
-
+        <div class="fd-data-list">
             {% if show_department %}
-            <div class="info-row">
-                <div class="label">Department</div>
-                <div class="value">
-                    {{ contact.department|default:"Not assigned" }}
-                </div>
+            <div class="fd-data-item">
+                <span class="fd-data-item__label">Department</span>
+                <span class="fd-data-item__value">{{ contact.department|default:"Not assigned" }}</span>
             </div>
             {% endif %}
-
-            <div class="info-row">
-                <div class="label">Email</div>
-                <div class="value text-break">
-                    {{ contact.email|default:"Not available" }}
-                </div>
+            <div class="fd-data-item">
+                <span class="fd-data-item__label">Email</span>
+                <span class="fd-data-item__value email-break">{{ contact.email|default:"Not available" }}</span>
             </div>
-
-            <div class="info-row">
-                <div class="label">Mobile</div>
-                <div class="value">
-                    {{ contact.mobile_number|default:"Not available" }}
-                </div>
+            <div class="fd-data-item">
+                <span class="fd-data-item__label">Mobile</span>
+                <span class="fd-data-item__value">{{ contact.mobile_number|default:"Not available" }}</span>
             </div>
-
         </div>
 
-        <!-- Actions -->
-        <div class="mt-4 d-flex">
+        <div class="fd-contact-card__actions">
             {% if contact.email %}
-                <a href="mailto:{{ contact.email }}"
-                   class="btn btn-outline-primary btn-sm mr-2">
-                    <i class="fas fa-envelope mr-1"></i>Email
-                </a>
+            <a href="mailto:{{ contact.email }}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-envelope"></i>Email
+            </a>
             {% endif %}
-
             {% if contact.mobile_number %}
-                <a href="tel:{{ contact.mobile_number }}"
-                   class="btn btn-outline-success btn-sm">
-                    <i class="fas fa-phone mr-1"></i>Call
-                </a>
+            <a href="tel:{{ contact.mobile_number }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-phone"></i>Call
+            </a>
             {% endif %}
         </div>
-
         {% else %}
-
-        <div class="text-center text-muted py-5">
-            <i class="fas fa-user-slash mb-2"></i>
+        <div class="fd-empty-state">
+            <i class="fas fa-user-slash fa-2x mb-3 d-block"></i>
             <div>Contact not available</div>
         </div>
-
         {% endif %}
     </div>
 </div>
-
-<style>
-    .professional-card {
-    border-radius: 8px;
-    background: #fff;
-}
-
-/* Info rows like table */
-.info-section {
-    border-top: 1px solid #eee;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.info-row:last-child {
-    border-bottom: none;
-}
-
-.label {
-    font-size: 13px;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.value {
-    font-size: 14px;
-    color: #212529;
-    font-weight: 500;
-    text-align: right;
-    max-width: 60%;
-}
-
-/* Buttons clean look */
-.btn-outline-primary,
-.btn-outline-success {
-    border-width: 1px;
-}
-
-/* Remove flashy hover */
-.professional-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-</style>

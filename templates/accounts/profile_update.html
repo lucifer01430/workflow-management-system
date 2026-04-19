@@ -2,6 +2,7 @@
 
 {% block title %}Update Profile{% endblock %}
 {% block page_title %}Update Profile{% endblock %}
+{% block page_subtitle %}Update approved personal details within a consistent, premium account editing experience.{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
@@ -14,17 +15,31 @@
 {% endblock %}
 
 {% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Profile editing</span>
+        <h2>Refine your personal workspace details.</h2>
+        <p>Update permitted fields without disturbing role, department, designation, or any approval-controlled account configuration.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ request.user.get_role_display }}</span>
+        <span>{{ request.user.email }}</span>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-xl-4">
         <div class="card">
-            <div class="card-body text-center">
-                {% if request.user.profile_image %}
-                <img id="profilePreview" src="{{ request.user.profile_image.url }}" alt="Profile image" class="img-circle elevation-2 profile-avatar mb-3" width="120" height="120">
-                {% else %}
-                <img id="profilePreview" src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/img/user2-160x160.jpg" alt="Profile image" class="img-circle elevation-2 profile-avatar mb-3" width="120" height="120">
-                {% endif %}
-                <h3 class="h4 mb-1">{{ request.user.full_name|default:request.user.username }}</h3>
-                <p class="text-muted mb-0">{{ request.user.email }}</p>
+            <div class="card-body fd-profile-card">
+                <div class="fd-profile-card__avatar mx-auto">
+                    {% if request.user.profile_image %}
+                    <img id="profilePreview" src="{{ request.user.profile_image.url }}" alt="Profile image" class="profile-avatar">
+                    {% else %}
+                    <img id="profilePreview" src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/img/user2-160x160.jpg" alt="Profile image" class="profile-avatar">
+                    {% endif %}
+                </div>
+                <div class="fd-profile-card__name">{{ request.user.full_name|default:request.user.username }}</div>
+                <p class="fd-profile-card__meta mb-0">{{ request.user.email }}</p>
             </div>
         </div>
     </div>
