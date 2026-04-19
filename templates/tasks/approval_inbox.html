@@ -33,7 +33,16 @@
             <div class="card-header border-0">
                 <div class="d-flex justify-content-between align-items-center flex-wrap">
                     <h3 class="card-title mb-2 mb-md-0"><i class="fas fa-file-signature mr-2 text-danger"></i>Pending Approval Tasks</h3>
-                    <input type="text" class="form-control form-control-sm fd-toolbar-search" placeholder="Search approvals (UI placeholder)">
+                    <form method="get" class="d-flex flex-wrap gap-2">
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ filters.q }}"
+                            class="form-control form-control-sm fd-toolbar-search"
+                            placeholder="Search title, owner, or department">
+                        <button type="submit" class="btn btn-sm btn-primary">Search</button>
+                        <a href="{% url 'tasks:approval_inbox' %}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    </form>
                 </div>
             </div>
             <div class="card-body">
@@ -65,10 +74,15 @@
                                 <td class="text-right">
                                     <div class="btn-group" role="group">
                                         <a href="{% url 'tasks:detail' task.id %}" class="btn btn-sm btn-outline-info"><i class="fas fa-eye mr-1"></i>View</a>
-                                        <a href="{% url 'tasks:approve' task.id %}" class="btn btn-sm btn-success"><i class="fas fa-check mr-1"></i>Approve</a>
+                                        <form method="post" action="{% url 'tasks:approve' task.id %}" class="d-inline-block">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{% url 'tasks:approval_inbox' %}{% if filters.q %}?q={{ filters.q|urlencode }}{% endif %}">
+                                            <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check mr-1"></i>Approve</button>
+                                        </form>
                                     </div>
                                     <form method="post" action="{% url 'tasks:reject' task.id %}" class="d-inline-block ml-2">
                                         {% csrf_token %}
+                                        <input type="hidden" name="next" value="{% url 'tasks:approval_inbox' %}{% if filters.q %}?q={{ filters.q|urlencode }}{% endif %}">
                                         <input type="hidden" name="reason" value="Rejected from approval inbox">
                                         <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-times mr-1"></i>Reject</button>
                                     </form>

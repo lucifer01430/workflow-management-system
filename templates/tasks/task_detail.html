@@ -190,7 +190,7 @@
                             <span class="fd-user-chip" style="width:2.5rem;height:2.5rem;"><i class="fas {{ item.icon }}"></i></span>
                             <div class="fd-surface-item__copy">
                                 <strong>{{ item.title }}</strong>
-                                <span>{{ item.actor }} • {{ item.timestamp|date:"d M Y, h:i A" }}</span>
+                                <span>{{ item.actor }} - {{ item.timestamp|date:"d M Y, h:i A" }}</span>
                                 <span>{{ item.description }}</span>
                             </div>
                         </div>
@@ -229,11 +229,16 @@
                 <div class="fd-form-stack">
                     {% if can_approve_task %}
                     <div class="fd-inline-note">This task is waiting for approval. Use the controls below to approve it or reject it with a reason.</div>
-                    <a href="{% url 'tasks:approve' task.id %}?next={% url 'tasks:detail' task.id %}" class="btn btn-success fd-btn-block">
-                        <i class="fas fa-check"></i>Approve Task
-                    </a>
+                    <form method="post" action="{% url 'tasks:approve' task.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'tasks:detail' task.id %}">
+                        <button type="submit" class="btn btn-success fd-btn-block">
+                            <i class="fas fa-check"></i>Approve Task
+                        </button>
+                    </form>
                     <form method="post" action="{% url 'tasks:reject' task.id %}">
                         {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'tasks:detail' task.id %}">
                         <label for="id_reason" class="form-label">Rejection Reason</label>
                         {{ rejection_form.reason }}
                         {% if rejection_form.reason.errors %}
@@ -245,6 +250,7 @@
                     </form>
                     {% endif %}
 
+                    {% if not can_approve_task %}
                     <form method="post" action="{% url 'tasks:update_deadline' task.id %}">
                         {% csrf_token %}
                         <label for="{{ deadline_form.due_date.id_for_label }}" class="form-label">Update Deadline</label>
@@ -287,6 +293,7 @@
                             <i class="fas fa-arrows-rotate"></i>Update Status
                         </button>
                     </form>
+                    {% endif %}
                 </div>
                 {% endif %}
 

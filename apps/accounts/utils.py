@@ -10,7 +10,10 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from apps.auditlogs.utils import log_activity
 from apps.accounts.models import EmailOTP, RegistrationStatus, User, UserRole
+from apps.notifications.models import NotificationType
+from apps.notifications.utils import create_notification, send_action_email
 
 logger = logging.getLogger(__name__)
 
@@ -154,3 +157,100 @@ def get_reporting_contacts(user):
         reporting_gm = gm_queryset.first()
 
     return reporting_hod, reporting_gm
+
+
+def approve_user_account(*, user, approved_by):
+    user.registration_status = RegistrationStatus.APPROVED
+    user.is_active = True
+    user.is_active_by_admin = True
+    user.approved_by = approved_by
+    user.approved_at = timezone.now()
+    user.rejection_reason = ""
+    user.save(
+        update_fields=[
+            "is_active",
+            "registration_status",
+            "is_active_by_admin",
+            "approved_by",
+            "approved_at",
+            "rejection_reason",
+        ]
+    )
+
+    create_notification(
+        recipient=user,
+        title="Account Approved",
+        message="Your account has been approved and is now active.",
+        notification_type=NotificationType.ACCOUNT_APPROVED,
+    )
+    send_action_email(
+        subject="Account Approved",
+        message="Your account has been approved.",
+        recipient_list=[user.email] if user.email else [],
+        html_template="emails/account_approved_email.html",
+        text_template="emails/account_approved_email.txt",
+        context={
+            "subject": "Account Approved",
+            "heading": "Account approved",
+            "recipient_name": user.full_name or user.username,
+            "email": user.email,
+            "role": user.get_role_display(),
+            "department": user.department or "-",
+            "action_copy": "You can now sign in and access your workflow dashboard.",
+        },
+    )
+    log_activity(
+        actor=approved_by,
+        action="account_approved",
+        target_model="User",
+        target_id=user.id,
+        description=f"Account approved for '{user.email}'.",
+    )
+    return user
+
+
+def reject_user_account(*, user, rejected_by, reason=""):
+    user.registration_status = RegistrationStatus.REJECTED
+    user.is_active_by_admin = False
+    user.approved_by = None
+    user.approved_at = None
+    user.rejection_reason = reason or "No reason provided"
+    user.save(
+        update_fields=[
+            "registration_status",
+            "is_active_by_admin",
+            "approved_by",
+            "approved_at",
+            "rejection_reason",
+        ]
+    )
+
+    create_notification(
+        recipient=user,
+        title="Account Rejected",
+        message="Your account request could not be approved.",
+        notification_type=NotificationType.ACCOUNT_REJECTED,
+    )
+    send_action_email(
+        subject="Account Rejected",
+        message="Your account has been rejected.",
+        recipient_list=[user.email] if user.email else [],
+        html_template="emails/account_rejected_email.html",
+        text_template="emails/account_rejected_email.txt",
+        context={
+            "subject": "Account Rejected",
+            "heading": "Account rejected",
+            "recipient_name": user.full_name or user.username,
+            "email": user.email,
+            "rejection_reason": reason or "No reason provided",
+            "action_copy": "Please contact the administrator if you need clarification or a revised account request.",
+        },
+    )
+    log_activity(
+        actor=rejected_by,
+        action="account_rejected",
+        target_model="User",
+        target_id=user.id,
+        description=f"Account rejected for '{user.email}'. Reason: {reason or 'No reason provided'}",
+    )
+    return user

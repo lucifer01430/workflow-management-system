@@ -54,15 +54,28 @@
                         All Tasks Overview
                         {% endif %}
                     </h3>
-                    <div class="d-flex flex-wrap gap-2">
-                        <input type="text" class="form-control form-control-sm fd-toolbar-search" placeholder="Search tasks (UI placeholder)">
-                        <select class="form-control form-control-sm fd-toolbar-select">
-                            <option>All statuses</option>
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
+                    <form method="get" class="d-flex flex-wrap gap-2">
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ filters.q }}"
+                            class="form-control form-control-sm fd-toolbar-search"
+                            placeholder="Search task title, owner, or department">
+                        <select name="status" class="form-control form-control-sm fd-toolbar-select">
+                            <option value="">All statuses</option>
+                            {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
                         </select>
-                    </div>
+                        <select name="task_type" class="form-control form-control-sm fd-toolbar-select">
+                            <option value="">All task types</option>
+                            {% for value, label in task_type_choices %}
+                            <option value="{{ value }}" {% if filters.task_type == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+                        <a href="{% url 'tasks:my_tasks' %}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    </form>
                 </div>
             </div>
             <div class="card-body">

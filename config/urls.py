@@ -10,6 +10,7 @@ urlpatterns = [
     path("dashboard/", include("apps.dashboard.urls")),
     path("tasks/", include("apps.tasks.urls")),
     path("notifications/", include("apps.notifications.urls")),
+    path("reports/", include("apps.reports.urls")),
 ]
 
 if settings.DEBUG:

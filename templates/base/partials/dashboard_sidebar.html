@@ -60,6 +60,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{% url 'reports:overview' %}" class="nav-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>My Reports</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{% url 'accounts:profile' %}" class="nav-link {% if request.resolver_match.namespace == 'accounts' and request.resolver_match.url_name == 'profile' %}active{% endif %}">
                         <i class="nav-icon fas fa-user"></i>
                         <p>My Profile</p>
@@ -82,6 +88,12 @@
                     <a href="{% url 'notifications:list' %}" class="nav-link {% if request.resolver_match.namespace == 'notifications' %}active{% endif %}">
                         <i class="nav-icon fas fa-bell"></i>
                         <p>Notifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'reports:overview' %}" class="nav-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>Reports</p>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -116,6 +128,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{% url 'reports:overview' %}" class="nav-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>Reports &amp; Export</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{% url 'accounts:profile' %}" class="nav-link {% if request.resolver_match.namespace == 'accounts' and request.resolver_match.url_name == 'profile' %}active{% endif %}">
                         <i class="nav-icon fas fa-user"></i>
                         <p>My Profile</p>
@@ -144,6 +162,12 @@
                     <a href="{% url 'notifications:list' %}" class="nav-link {% if request.resolver_match.namespace == 'notifications' %}active{% endif %}">
                         <i class="nav-icon fas fa-bell"></i>
                         <p>Notifications</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'reports:overview' %}" class="nav-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>Reports &amp; Export</p>
                     </a>
                 </li>
                 <li class="nav-item">

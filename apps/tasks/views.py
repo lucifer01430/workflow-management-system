@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.models import UserRole
@@ -164,9 +165,33 @@ def my_tasks_view(request):
     else:
         tasks = Task.objects.none()
 
+    search_query = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status", "").strip()
+    task_type_filter = request.GET.get("task_type", "").strip()
+
+    if search_query:
+        tasks = tasks.filter(
+            Q(title__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(created_by__full_name__icontains=search_query)
+            | Q(created_by__username__icontains=search_query)
+            | Q(department__name__icontains=search_query)
+        )
+    if status_filter:
+        tasks = tasks.filter(status=status_filter)
+    if task_type_filter:
+        tasks = tasks.filter(task_type=task_type_filter)
+
     context = {
-        "tasks": tasks,
+        "tasks": tasks.order_by("-updated_at"),
         "page_title": "My Tasks",
+        "filters": {
+            "q": search_query,
+            "status": status_filter,
+            "task_type": task_type_filter,
+        },
+        "status_choices": TaskStatus.choices,
+        "task_type_choices": Task._meta.get_field("task_type").choices,
     }
     return render(request, "tasks/my_tasks.html", context)
 
@@ -229,10 +254,20 @@ def approval_inbox_view(request):
         "category",
         "created_by",
     )
+    search_query = request.GET.get("q", "").strip()
+    if search_query:
+        tasks = tasks.filter(
+            Q(title__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(created_by__full_name__icontains=search_query)
+            | Q(created_by__username__icontains=search_query)
+            | Q(department__name__icontains=search_query)
+        )
 
     context = {
-        "tasks": tasks,
+        "tasks": tasks.order_by("-updated_at"),
         "page_title": "Approval Inbox",
+        "filters": {"q": search_query},
     }
     return render(request, "tasks/approval_inbox.html", context)
 
@@ -242,11 +277,13 @@ def approve_task_view(request, task_id):
     if request.user.role not in [UserRole.GENERAL_MANAGER, UserRole.SUPER_ADMIN]:
         messages.error(request, "You do not have permission to approve tasks.")
         return redirect("dashboard:home")
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
 
     task = get_object_or_404(Task, id=task_id)
     approve_task(task=task, approved_by=request.user)
     messages.success(request, f"Task '{task.title}' approved successfully.")
-    next_url = request.GET.get("next") or request.META.get("HTTP_REFERER")
+    next_url = request.POST.get("next") or request.GET.get("next") or request.META.get("HTTP_REFERER")
     if next_url:
         return redirect(next_url)
     return redirect("tasks:detail", task_id=task.id)
@@ -257,6 +294,8 @@ def reject_task_view(request, task_id):
     if request.user.role not in [UserRole.GENERAL_MANAGER, UserRole.SUPER_ADMIN]:
         messages.error(request, "You do not have permission to reject tasks.")
         return redirect("dashboard:home")
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
 
     task = get_object_or_404(Task, id=task_id)
     if task.status != TaskStatus.PENDING_APPROVAL:
@@ -269,7 +308,7 @@ def reject_task_view(request, task_id):
         messages.warning(request, f"Task '{task.title}' rejected.")
     else:
         messages.error(request, "Please provide a valid rejection reason.")
-    next_url = request.GET.get("next") or request.META.get("HTTP_REFERER")
+    next_url = request.POST.get("next") or request.GET.get("next") or request.META.get("HTTP_REFERER")
     if next_url:
         return redirect(next_url)
     return redirect("tasks:detail", task_id=task.id)
@@ -316,6 +355,10 @@ def update_task_status_view(request, task_id):
     if not can_manage and not is_assigned_employee:
         messages.error(request, "You do not have permission to update this task.")
         return redirect("dashboard:home")
+
+    if can_manage and task.status == TaskStatus.PENDING_APPROVAL:
+        messages.error(request, "Approve or reject this task before changing its workflow status.")
+        return redirect("tasks:detail", task_id=task.id)
 
     form = TaskStatusUpdateForm(request.POST or None, manager=can_manage)
     if request.method == "POST" and form.is_valid():

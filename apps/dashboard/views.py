@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render
 
+from apps.accounts.utils import get_reporting_contacts
 from apps.accounts.models import User, UserRole
 from apps.notifications.models import Notification
 from apps.tasks.models import Task, TaskStatus
@@ -39,27 +40,7 @@ def dashboard_home(request):
         is_read=False,
     ).count()
 
-    reporting_hod = None
-    reporting_gm = None
-
-    if user.role == UserRole.EMPLOYEE:
-        if user.department and user.department.hod:
-            reporting_hod = user.department.hod
-
-        reporting_gm = User.objects.filter(
-            role=UserRole.GENERAL_MANAGER,
-            is_active=True,
-            is_active_by_admin=True,
-            registration_status="approved",
-        ).order_by("id").first()
-
-    elif user.role == UserRole.HOD:
-        reporting_gm = User.objects.filter(
-            role=UserRole.GENERAL_MANAGER,
-            is_active=True,
-            is_active_by_admin=True,
-            registration_status="approved",
-        ).order_by("id").first()
+    reporting_hod, reporting_gm = get_reporting_contacts(user)
 
     in_progress_count = task_queryset.filter(status=TaskStatus.IN_PROGRESS).count()
     assigned_tasks_count = task_queryset.filter(status=TaskStatus.ASSIGNED).count()

@@ -1,0 +1,172 @@
+{% extends "base/dashboard_base.html" %}
+
+{% block title %}Reports | Workflow Management System{% endblock %}
+{% block page_title %}Reports & Export{% endblock %}
+{% block page_subtitle %}Role-aware task reporting with live filters, operational summaries, and CSV export based on the same workflow visibility rules used across the app.{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Home</a></li>
+<li class="breadcrumb-item active">Reports</li>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'reports:export_csv' %}{% if query_string %}?{{ query_string }}{% endif %}" class="btn btn-primary">
+    <i class="fas fa-file-csv mr-1"></i>Export CSV
+</a>
+<a href="{% url 'tasks:my_tasks' %}" class="btn btn-outline-primary">
+    <i class="fas fa-list-check mr-1"></i>Open Tasks
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="fd-page-hero mb-4">
+    <div class="fd-page-hero__copy">
+        <span class="fd-page-eyebrow">Operational reporting</span>
+        <h2>Task reporting workspace</h2>
+        <p>Review the current workflow picture, narrow it with filters, and export the exact visible task scope for follow-up or external analysis.</p>
+    </div>
+    <div class="fd-pill-list">
+        <span>{{ request.user.get_role_display }}</span>
+        <span>{{ summary.total }} task{{ summary.total|pluralize }}</span>
+        <span>{{ request.user.department|default:"Cross-department view" }}</span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="mini-stat h-100">
+            <div class="label">Visible Tasks</div>
+            <div class="value">{{ summary.total }}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="mini-stat h-100">
+            <div class="label">Active Workflow</div>
+            <div class="value">{{ summary.active }}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="mini-stat h-100">
+            <div class="label">Completed / Closed</div>
+            <div class="value">{{ summary.completed }}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="mini-stat h-100">
+            <div class="label">Overdue</div>
+            <div class="value">{{ summary.overdue }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header border-0">
+        <h3 class="card-title"><i class="fas fa-filter mr-2 text-primary"></i>Report Filters</h3>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-select">
+                    <option value="">All priorities</option>
+                    {% for value, label in priority_choices %}
+                    <option value="{{ value }}" {% if filters.priority == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Task Type</label>
+                <select name="task_type" class="form-select">
+                    <option value="">All task types</option>
+                    {% for value, label in task_type_choices %}
+                    <option value="{{ value }}" {% if filters.task_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <label class="form-label">Department</label>
+                <select name="department" class="form-select">
+                    <option value="">All departments</option>
+                    {% for department in departments %}
+                    <option value="{{ department.id }}" {% if filters.department == department.id|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-magnifying-glass mr-1"></i>Apply Filters
+                </button>
+                <a href="{% url 'reports:overview' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-rotate-left mr-1"></i>Reset
+                </a>
+                <a href="{% url 'reports:export_csv' %}{% if query_string %}?{{ query_string }}{% endif %}" class="btn btn-outline-primary">
+                    <i class="fas fa-download mr-1"></i>Export Current View
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card fd-table-card">
+    <div class="card-header border-0">
+        <h3 class="card-title"><i class="fas fa-chart-column mr-2 text-info"></i>Task Report Results</h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Task</th>
+                        <th>Department</th>
+                        <th>Owner</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Due Date</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>#{{ task.id }}</td>
+                        <td>
+                            <div class="font-weight-bold">{{ task.title }}</div>
+                            <small class="text-muted">{{ task.category|default:"Uncategorized" }}</small>
+                        </td>
+                        <td>{{ task.department|default:"-" }}</td>
+                        <td>{{ task.created_by.full_name|default:task.created_by.username }}</td>
+                        <td><span class="badge status-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span></td>
+                        <td><span class="badge status-badge status-{{ task.status }}">{{ task.get_status_display }}</span></td>
+                        <td>{{ task.get_task_type_display }}</td>
+                        <td>{{ task.due_date|date:"d M Y, h:i A"|default:"-" }}</td>
+                        <td class="text-right">
+                            <a href="{% url 'tasks:detail' task.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye mr-1"></i>Open
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="fas fa-chart-line fa-2x d-block mb-3"></i>
+                            No tasks match the selected report filters.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
